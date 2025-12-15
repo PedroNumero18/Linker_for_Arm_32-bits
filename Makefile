@@ -6,11 +6,21 @@ SRC_DIR=src/
 BIN_DIR=bin/
 
 TARGET=linker 
-SRC=$(SRC_DIR)$(wildcard *.c)
-OBJS=$(BIN_DIR)$(wildcard *.o)
+SRC=$(wildcard $(SRC_DIR)*.c)
+OBJS=$(patsubst $(SRC_DIR)%.c, $(BIN_DIR)%.o, $(SRC))
 
-.PHONE 
+.PHONY: All clean 
 
 All: $(TARGET)
 
-$(TARGET):
+$(BIN_DIR):
+	mkdir bin
+
+$(TARGET): $(OBJS)
+	$(CC) -o $@ $^
+
+$(BIN_DIR)%.o: $(SRC_DIR)%.c | $(BIN_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean: 
+	rm -rf $(BIN_DIR) $(TARGET)
