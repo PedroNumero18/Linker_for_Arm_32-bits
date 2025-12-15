@@ -22,6 +22,25 @@ typedef struct {
 	Elf32_Half	e_shstrndx;	/* Section name strings section. */
 } Elf32_Ehdr;
 
-void lire_header();
+typedef struct {
+	Elf32_Word	sh_name;	/* Section name (index into the
+					   section header string table). */
+	Elf32_Word	sh_type;	/* Section type. */
+	Elf32_Word	sh_flags;	/* Section flags. */
+	Elf32_Addr	sh_addr;	/* Address in memory image. */
+	Elf32_Off	sh_offset;	/* Offset in file. */
+	Elf32_Word	sh_size;	/* Size in bytes. */
+	Elf32_Word	sh_link;	/* Index of a related section. */
+	Elf32_Word	sh_info;	/* Depends on section type. */
+	Elf32_Word	sh_addralign;	/* Alignment in bytes. */
+	Elf32_Word	sh_entsize;	/* Size of each entry in section. */
+} Elf32_Shdr;
+
+typedef struct { 
+    Elf32_Ehdr header ;
+    Elf32_Shdr section; 
+} ELF ;
+
+void lire_header(FILE* file, ELF* elf);
 
 #endif
