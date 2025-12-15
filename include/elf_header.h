@@ -1,12 +1,18 @@
 #ifndef __ELF_HEADER__
 #define __ELF_HEADER__
 
+#define EI_NIDENT 16
+
+#include <stdint.h>
+#include <stdio.h> 
+
 typedef uint32_t	Elf32_Addr;
 typedef uint16_t	Elf32_Half;
 typedef uint32_t	Elf32_Off;
+typedef uint32_t	Elf32_Word;
 
 typedef struct {
-	unsigned char	e_ident[EI_NIDENT];	/* File identification. */
+	unsigned char e_ident[EI_NIDENT];	/* File identification. */
 	Elf32_Half	e_type;		/* File type. */
 	Elf32_Half	e_machine;	/* Machine architecture. */
 	Elf32_Word	e_version;	/* ELF format version. */
