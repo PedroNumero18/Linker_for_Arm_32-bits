@@ -29,7 +29,7 @@ void lire_header(FILE* file, elf32_t* elf){
         exit(1);
     }
 
-    //si faut corriger l'endianess faudra faire plein de conversion mais pour le moment blk
+    //si faut corriger l'endianess faudra faire plein de conversion mais pour le moment blc
     /*
     if (!((elf->header).e_ident[EI_DATA]).is_big_endian()) {
         //si c'est pas en big endian

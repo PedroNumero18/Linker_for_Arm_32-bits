@@ -4,13 +4,13 @@
 #include "elf.h"
 
 void error(const char* msg){
-    perror(msg);
+    fprintf(stderr, "%s", msg);
     exit(1);
 }
 
 int main(int argc,char *argv[]){
     if(argc <2){
-        error("le nombrez de fichier est incorrrect");
+        error("le nombre de fichier est incorrrect");
     }
     
     elf32_t* elf = malloc(sizeof(elf32_t));
@@ -18,7 +18,7 @@ int main(int argc,char *argv[]){
         error("Error allocating memory to pointer\n");
     }
     
-    FILE* inputFile = fopen(argv[2],"rb");
+    FILE* inputFile = fopen(argv[1],"rb");
     if (!inputFile){
         error("Error opening file\n");
     }
