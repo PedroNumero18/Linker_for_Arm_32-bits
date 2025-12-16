@@ -30,11 +30,26 @@ void lire_header(FILE* file, elf32_t* elf){
         exit(1);
     }
 
+    if((elf->header).e_ident[EI_DATA] <= 0 || (elf->header).e_ident[EI_DATA] > 2 ){
+        fprintf(stderr,"Erreur e_ident[EI_DATA]\n");
+        exit(1);
+    }
+
     get_16B(&elf->header.e_type, file);
     get_16B(&elf->header.e_machine, file);
     get_32B(&elf->header.e_version, file);
     get_32B(&elf->header.e_entry, file);
-    
+    get_32B(&elf->header.e_phoff, file);
+    get_32B(&elf->header.e_shoff, file);
+    get_32B(&elf->header.e_flags, file);
+    get_16B(&elf->header.e_ehsize, file);
+    get_16B(&elf->header.e_phentsize, file);
+    get_16B(&elf->header.e_phnum, file);
+    get_16B(&elf->header.e_shentsize, file);
+    get_16B(&elf->header.e_shnum, file);
+    get_16B(&elf->header.e_shstrndx, file);
+
+
 }
 
 void affichage_entete(Elf32_Ehdr* header){
@@ -89,13 +104,13 @@ void affichage_entete(Elf32_Ehdr* header){
     /* Version */
     printf("  Version:                           0x%x\n", header->e_version);
     printf("  Adresse du point d'entrée:         0x%x\n", header->e_entry);
-    printf("  Début des en-têtes de programme:   %u\n", header->e_phoff);
-    printf("  Début des en-têtes de section:     %u\n", header->e_shoff);
+    printf("  Début des en-têtes de programme:   %u (bytes dans le fichier)\n", header->e_phoff);
+    printf("  Début des en-têtes de section:     %u (bytes dans le fichier)\n", header->e_shoff);
     printf("  Fanions:                           0x%x\n", header->e_flags);
-    printf("  Taille de cet en-tête:             %u\n", header->e_ehsize);
-    printf("  Taille entrée programme:           %u\n", header->e_phentsize);
+    printf("  Taille de cet en-tête:             %u (bytes)\n", header->e_ehsize);
+    printf("  Taille entrée programme:           %u (bytes)\n", header->e_phentsize);
     printf("  Nombre entrées programme:          %u\n", header->e_phnum);
-    printf("  Taille entrée section:             %u\n", header->e_shentsize);
+    printf("  Taille entrée section:             %u (bytes)\n", header->e_shentsize);
     printf("  Nombre entrées section:            %u\n", header->e_shnum);
     printf("  Index .shstrtab:                   %u\n", header->e_shstrndx);
 }
