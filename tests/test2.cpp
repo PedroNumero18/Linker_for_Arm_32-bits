@@ -1,3 +1,4 @@
+#ifndef __TEST2__
 #define __TEST2__
 
 #include "header_Test1_2.h"
@@ -9,3 +10,5 @@ int main(){
     int res = Madd(test.getA(), test.getB());
     return res;
 }
+
+#endif

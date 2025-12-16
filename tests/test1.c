@@ -1,3 +1,4 @@
+#ifndef __TEST1__
 #define __TEST1__
 
 #include "header_Test1_2.h"
@@ -9,3 +10,4 @@ int main(void){
     int res = Madd(a, b); 
     return res;
 }
+#endif
