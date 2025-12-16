@@ -79,7 +79,7 @@ typedef struct {
 
 typedef struct { 
     Elf32_Ehdr header ;
-    Elf32_Shdr section; 
+    Elf32_Shdr* sections; 
 }elf32_t ;
 
 /*
@@ -99,10 +99,10 @@ void affichage_entete(Elf32_Ehdr* header);
 
 
 //Q2
-void lire_section(FILE* file,elf32_t* elf);
+void lire_sections(FILE* file,elf32_t* elf);
 
 
-void affichage_section(elf32_t* elf);
+void affichage_sections(elf32_t* elf);
 
 
 #endif
