@@ -1,23 +1,35 @@
 #include <stdlib.h> 
 #include <stdio.h>
 
-#include "elf_header.h"
+#include "elf.h"
 
 void lire_header(FILE* file, ELF* elf){
+    /*
+    Semantique à écrire
+    */
     if (file == NULL || elf == NULL){
         fprintf(stderr,"Erreur fichier ou d'initialisation d'elf\n");
         exit(1);
     }
-    //lecture ei indent
-    fread((elf->header).e_ident,1,EI_NIDENT,file);
+    //lecture ei indent + verif
+    fseek(file,0,SEEK_SET);
+    fread(&(elf->header),sizeof(Elf32_Ehdr),1,file);
+
     if (!((elf->header).e_ident[EI_MAG0] == ELFMAG0 && (elf->header).e_ident[EI_MAG1] == ELFMAG1 && (elf->header).e_ident[EI_MAG2] == ELFMAG2 && (elf->header).e_ident[EI_MAG3] == ELFMAG3)) {
         fprintf(stderr,"Erreur fichier, ce n'est pas un fichier ELF \n");
         exit(1);
     }
-    
-    //Verif si fichier pas elf ?
-    //du genre regarder première ligne que ce soit bien elf et autre
-    //autrement dit : la première ligne c bien 0x7f 'E' 'L' 'F'
+
+    if (!((elf->header).e_ident[EI_CLASS] == ELFCLASS32)) {
+        fprintf(stderr,"Erreur fichier, ce n'est pas un e class 32\n");
+        exit(1);
+    }
+
+    //si faut corriger l'endianess faudra faire plein de conversion mais pour le moment blk
+    if (!((elf->header).e_ident[EI_DATA]).is_big_endian()) {
+        //si c'est pas en big endian
+        //on converti... TOUT
+    }
 
 
 }

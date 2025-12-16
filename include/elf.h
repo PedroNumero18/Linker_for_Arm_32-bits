@@ -84,6 +84,7 @@ typedef struct {
     Elf32_Ehdr header ;
     Elf32_Shdr section; 
 } ELF ;
+
 /*
 pour l'instant on s'en fout on vera quand on sera sur les sections
 typedef struct {
@@ -93,8 +94,18 @@ typedef struct {
 } ELF;
 */
 
+//Q1
 void lire_header(FILE* file, ELF* elf);
 
 void affichage_entete(Elf32_Ehdr* header);
+
+
+
+//Q2
+void lire_section(FILE* file,ELF *elf);
+
+
+void affichage_section(ELF *elf);
+
 
 #endif

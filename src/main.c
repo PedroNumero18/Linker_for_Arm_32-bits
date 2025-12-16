@@ -1,6 +1,7 @@
-#include "elf_header.h"
 #include <stdlib.h> 
-#include <stdio.h> 
+#include <stdio.h>
+
+#include "elf.h"
 
 
 int main(int argc,char *argv[]){
@@ -9,5 +10,6 @@ int main(int argc,char *argv[]){
         return 1;
     }
     
+
     return 0;
 }
