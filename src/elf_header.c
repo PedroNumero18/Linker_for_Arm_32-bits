@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "elf.h"
+#include "utils.h"
 
 void lire_header(FILE* file, elf32_t* elf){
     /*
@@ -13,30 +14,27 @@ void lire_header(FILE* file, elf32_t* elf){
     }
     //lecture ei indent + verif
     fseek(file,0,SEEK_SET);
-    fread(&(elf->header),sizeof(Elf32_Ehdr),1,file);
+    fread(&(elf->header).e_ident,sizeof((elf->header).e_ident),1,file);
 
-    if(!(((elf->header).e_ident[EI_MAG0] == ELFMAG0)
-        && ((elf->header).e_ident[EI_MAG1] == ELFMAG1) 
-        && ((elf->header).e_ident[EI_MAG2] == ELFMAG2) 
-        && ((elf->header).e_ident[EI_MAG3] == ELFMAG3))
+    if(((elf->header).e_ident[EI_MAG0] != ELFMAG0)
+        && ((elf->header).e_ident[EI_MAG1] != ELFMAG1) 
+        && ((elf->header).e_ident[EI_MAG2] != ELFMAG2) 
+        && ((elf->header).e_ident[EI_MAG3] != ELFMAG3)
     ){
         fprintf(stderr,"Erreur fichier, ce n'est pas un fichier ELF \n");
         exit(1);
     }
-
+    
     if (!((elf->header).e_ident[EI_CLASS] == ELFCLASS32)) {
-        fprintf(stderr,"Erreur fichier, ce n'est pas un e class 32\n");
+        fprintf(stderr,"Erreur fichier, ce n'est pas une class 32\n");
         exit(1);
     }
 
-    //si faut corriger l'endianess faudra faire plein de conversion mais pour le moment blc
-    /*
-    if (!((elf->header).e_ident[EI_DATA]).is_big_endian()) {
-        //si c'est pas en big endian
-        //on converti... TOUT
-    }*/
-
-
+    get_16B(&elf->header.e_type, file);
+    get_16B(&elf->header.e_machine, file);
+    get_32B(&elf->header.e_version, file);
+    get_32B(&elf->header.e_entry, file);
+    
 }
 
 void affichage_entete(Elf32_Ehdr* header){

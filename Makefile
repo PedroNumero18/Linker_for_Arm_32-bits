@@ -1,7 +1,5 @@
 CC=clang
-RELEASE=-O2
-DEBUG=-g
-CFLAGS=-Wall -Werror -Wextra -Iinclude
+CFLAGS=-Wall -Werror -Wextra -Iinclude -g 
 
 SRC_DIR=src/
 BIN_DIR=bin/
@@ -12,12 +10,7 @@ OBJS=$(patsubst $(SRC_DIR)%.c, $(BIN_DIR)%.o, $(SRC))
 
 .PHONY: All clean 
 
-All: 
-	$(shell echo "use make debug or release")
-
-release: $(TARGET)
-
-debug: $(TARGET)
+All: $(TARGET)
 
 $(BIN_DIR):
 	mkdir -p bin
