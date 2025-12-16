@@ -3,7 +3,7 @@
 
 #include "elf.h"
 
-void lire_section(FILE* file,ELF *elf) {
+void lire_section(FILE* file, elf32_t* elf) {
     /*
     
     */
@@ -13,6 +13,6 @@ void lire_section(FILE* file,ELF *elf) {
     }
 }
 
-void affichage_section(ELF *elf) {
+/*void affichage_section(elf32_t* elf) {
 
-}
+}*/

@@ -3,7 +3,7 @@
 
 #include "elf.h"
 
-void lire_header(FILE* file, ELF* elf){
+void lire_header(FILE* file, elf32_t* elf){
     /*
     Semantique à écrire
     */
@@ -15,7 +15,11 @@ void lire_header(FILE* file, ELF* elf){
     fseek(file,0,SEEK_SET);
     fread(&(elf->header),sizeof(Elf32_Ehdr),1,file);
 
-    if (!((elf->header).e_ident[EI_MAG0] == ELFMAG0 && (elf->header).e_ident[EI_MAG1] == ELFMAG1 && (elf->header).e_ident[EI_MAG2] == ELFMAG2 && (elf->header).e_ident[EI_MAG3] == ELFMAG3)) {
+    if(!(((elf->header).e_ident[EI_MAG0] == ELFMAG0)
+        && ((elf->header).e_ident[EI_MAG1] == ELFMAG1) 
+        && ((elf->header).e_ident[EI_MAG2] == ELFMAG2) 
+        && ((elf->header).e_ident[EI_MAG3] == ELFMAG3))
+    ){
         fprintf(stderr,"Erreur fichier, ce n'est pas un fichier ELF \n");
         exit(1);
     }
@@ -26,14 +30,14 @@ void lire_header(FILE* file, ELF* elf){
     }
 
     //si faut corriger l'endianess faudra faire plein de conversion mais pour le moment blk
+    /*
     if (!((elf->header).e_ident[EI_DATA]).is_big_endian()) {
         //si c'est pas en big endian
         //on converti... TOUT
-    }
+    }*/
 
 
 }
-
 
 void affichage_entete(Elf32_Ehdr* header){
     //Faudra changer pour que le texte corresponde mais pour l'instant j'ai ça
@@ -65,7 +69,6 @@ void affichage_entete(Elf32_Ehdr* header){
     /* OS / ABI */
     switch (header->e_ident[EI_OSABI]) {
         case EM_NONE:  printf("  OS/ABI:                            UNIX - System V\n"); break;
-        case EM_M386:  printf("  OS/ABI:                            Linux\n"); break;
         case EM_ARM: printf("  OS/ABI:                            ARM EABI\n"); break;
         default: printf("  OS/ABI:                            Autre\n"); break;
     }

@@ -17,7 +17,7 @@
 #define EI_NIDENT  16
 
 
-#define ELFMAG0 '0x7f'
+#define ELFMAG0 (unsigned char)'0x7f'
 #define ELFMAG1 'E'
 #define ELFMAG2 'L'
 #define ELFMAG3 'F'
@@ -37,10 +37,7 @@
 
 //machines
 #define EM_NONE 0
-#define EM_M386 3
 #define EM_ARM 40
-#define EM_X86_64 62
-#define EM_AARCH64 183
 
 
 
@@ -68,7 +65,7 @@ typedef struct {
 
 typedef struct {
 	Elf32_Word	sh_name;	/* Section name (index into the
-					   section header string table). */
+					   		   section header string table). */
 	Elf32_Word	sh_type;	/* Section type. */
 	Elf32_Word	sh_flags;	/* Section flags. */
 	Elf32_Addr	sh_addr;	/* Address in memory image. */
@@ -83,7 +80,7 @@ typedef struct {
 typedef struct { 
     Elf32_Ehdr header ;
     Elf32_Shdr section; 
-} ELF ;
+}elf32_t ;
 
 /*
 pour l'instant on s'en fout on vera quand on sera sur les sections
@@ -95,17 +92,17 @@ typedef struct {
 */
 
 //Q1
-void lire_header(FILE* file, ELF* elf);
+void lire_header(FILE* file, elf32_t* elf);
 
 void affichage_entete(Elf32_Ehdr* header);
 
 
 
 //Q2
-void lire_section(FILE* file,ELF *elf);
+void lire_section(FILE* file,elf32_t* elf);
 
 
-void affichage_section(ELF *elf);
+void affichage_section(elf32_t* elf);
 
 
 #endif
