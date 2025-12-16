@@ -8,4 +8,76 @@ void lire_header(FILE* file, ELF* elf){
         fprintf(stderr,"Erreur fichier ou d'initialisation d'elf\n");
         exit(1);
     }
+    //Verif si fichier pas elf ?
+    //du genre regarder première ligne que ce soit bien elf et autre
+    //autrement dit : la première ligne c bien 0x7f 'E' 'L' 'F'
+
+
 }
+
+
+void affichage_entete(Elf32_Ehdr* header){
+    //Faudra changer pour que le texte corresponde mais pour l'instant j'ai ça
+    if (header == NULL){
+        fprintf(stderr,"Erreur d'initialisation d'header\n");
+        exit(1);
+    }
+
+    /* Magic */
+    printf("  Magique:   ");
+    for (int i = 0; i < EI_NIDENT; i++)
+        printf("%02x ", header->e_ident[i]);
+    printf("\n");
+
+    /* Classe */
+    if (header->e_ident[EI_CLASS] == ELFCLASS32)
+        printf("  Classe:                            ELF32\n");
+
+    /* Endianness */
+    if (header->e_ident[EI_DATA] == ELFDATA2MSB)
+        printf("  Données:                           Big endian\n");
+    else
+        printf("  Données:                           Little endian\n");
+
+    /* Version ELF */
+    printf("  Version:                           %u (current)\n",
+           header->e_ident[EI_VERSION]);
+
+    /* OS / ABI */
+    switch (header->e_ident[EI_OSABI]) {
+        case 0:  printf("  OS/ABI:                            UNIX - System V\n"); break;
+        case 3:  printf("  OS/ABI:                            Linux\n"); break;
+        case 64: printf("  OS/ABI:                            ARM EABI\n"); break;
+        default: printf("  OS/ABI:                            Autre\n"); break;
+    }
+
+    /* ABI version */
+    printf("  Version ABI:                       %u\n",
+           header->e_ident[EI_ABIVERSION]);
+
+    /* Type */
+    switch (header->e_type) {
+        case ET_REL:  printf("  Type:                              REL (Relocatable)\n"); break;
+        case ET_EXEC: printf("  Type:                              EXEC (Executable)\n"); break;
+        default:      printf("  Type:                              Autre\n"); break;
+    }
+
+    /* Machine */
+    if (header->e_machine == EM_ARM)
+        printf("  Machine:                           ARM\n");
+
+    /* Version */
+    printf("  Version:                           0x%x\n", header->e_version);
+    printf("  Adresse du point d'entrée:         0x%x\n", header->e_entry);
+    printf("  Début des en-têtes de programme:   %u\n", header->e_phoff);
+    printf("  Début des en-têtes de section:     %u\n", header->e_shoff);
+    printf("  Fanions:                           0x%x\n", header->e_flags);
+    printf("  Taille de cet en-tête:             %u\n", header->e_ehsize);
+    printf("  Taille entrée programme:           %u\n", header->e_phentsize);
+    printf("  Nombre entrées programme:          %u\n", header->e_phnum);
+    printf("  Taille entrée section:             %u\n", header->e_shentsize);
+    printf("  Nombre entrées section:            %u\n", header->e_shnum);
+    printf("  Index .shstrtab:                   %u\n", header->e_shstrndx);
+}
+
+
