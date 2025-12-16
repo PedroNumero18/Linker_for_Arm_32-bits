@@ -8,6 +8,13 @@ void lire_header(FILE* file, ELF* elf){
         fprintf(stderr,"Erreur fichier ou d'initialisation d'elf\n");
         exit(1);
     }
+    //lecture ei indent
+    fread((elf->header).e_ident,1,EI_NIDENT,file);
+    if (!((elf->header).e_ident[EI_MAG0] == ELFMAG0 && (elf->header).e_ident[EI_MAG1] == ELFMAG1 && (elf->header).e_ident[EI_MAG2] == ELFMAG2 && (elf->header).e_ident[EI_MAG3] == ELFMAG3)) {
+        fprintf(stderr,"Erreur fichier, ce n'est pas un fichier ELF \n");
+        exit(1);
+    }
+    
     //Verif si fichier pas elf ?
     //du genre regarder première ligne que ce soit bien elf et autre
     //autrement dit : la première ligne c bien 0x7f 'E' 'L' 'F'
@@ -45,9 +52,9 @@ void affichage_entete(Elf32_Ehdr* header){
 
     /* OS / ABI */
     switch (header->e_ident[EI_OSABI]) {
-        case 0:  printf("  OS/ABI:                            UNIX - System V\n"); break;
-        case 3:  printf("  OS/ABI:                            Linux\n"); break;
-        case 64: printf("  OS/ABI:                            ARM EABI\n"); break;
+        case EM_NONE:  printf("  OS/ABI:                            UNIX - System V\n"); break;
+        case EM_M386:  printf("  OS/ABI:                            Linux\n"); break;
+        case EM_ARM: printf("  OS/ABI:                            ARM EABI\n"); break;
         default: printf("  OS/ABI:                            Autre\n"); break;
     }
 
