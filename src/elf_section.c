@@ -40,6 +40,31 @@ void lire_sections(FILE* file, elf32_t* elf) {
     elf->section_str_table = (char *)elf->sections[elf->header.e_shstrndx].contenu;
 }
 
+const char *get_type(Elf32_Word t) {
+    switch (t) {
+    case SHT_NULL: return "NULL";
+    case SHT_PROGBITS: return "PROGBITS";
+    case SHT_SYMTAB: return "SYMTAB";
+    case SHT_STRTAB: return "STRTAB";
+    case SHT_RELA: return "RELA";
+    case SHT_HASH: return "HASH";
+    case SHT_DYNAMIC: return "DYNAMIC";
+    case SHT_NOTE: return "NOTE";
+    case SHT_NOBITS: return "NOBITS";
+    case SHT_REL: return "REL";
+    case SHT_SHLIB: return "SHLIB";
+    case SHT_DYNSYM: return "DYNSYM";
+    case SHT_LOPROC: return "LOPROC";
+    case SHT_HIPROC: return "HIPROC";
+    case SHT_LOUSER: return "LOUSER";
+    case SHT_HIUSER: return "HIUSER";
+    case SHT_ARM_ATTRIBUTES: return "ARM_ATTRIBUTES";
+    default:
+        return "OTHER";
+    }
+}
+
+
 
 void afficher_sections(const elf32_t* elf) {
     if (elf == NULL || (elf->sections) == NULL) {
@@ -54,10 +79,10 @@ void afficher_sections(const elf32_t* elf) {
     for (int i = 0; i < elf->header.e_shnum; i++) {
         const Elf32_Shdr* section = &elf->sections[i].h_section;
 
-        printf("  [%2d] %-20s %-18u %08x %06x %06x %02x %3u %2u %2u %2x\n", // c les décalage et les nombre de caractere que je prends pour l'instant
+        printf("  [%2d] %-20s %-18s %08x %06x %06x %02x %3u %2u %2u %2x\n", // c les décalage et les nombre de caractere que je prends pour l'instant
             i,
             elf->section_str_table + section->sh_name,                   // nom (plus tard) (une fonction ? / lire dans la string table ?)
-            section->sh_type,                       // type   (ici faudra une fonction pour remplacer le nombre par le bon nom) changer aussi le format dans le print ducoup %-18u par %18-s
+            get_type(section->sh_type),                       // type   (ici faudra une fonction pour remplacer le nombre par le bon nom) changer aussi le format dans le print ducoup %-18u par %18-s
             section->sh_addr,                        // adresse
             section->sh_offset,                      // décalage
             section->sh_size,                        // taille

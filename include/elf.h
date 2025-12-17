@@ -42,6 +42,44 @@ extern char* filename;   // Nom de fichier défini dans le main
 #define EM_ARM 40
 
 
+//sh_type possibles
+#define SHT_NULL          0                
+#define SHT_PROGBITS          1                
+#define SHT_SYMTAB          2               
+#define SHT_STRTAB          3                
+#define SHT_RELA          4               
+#define SHT_HASH          5               
+#define SHT_DYNAMIC          6              
+#define SHT_NOTE          7               
+#define SHT_NOBITS          8                
+#define SHT_REL                  9                
+#define SHT_SHLIB          10              
+#define SHT_DYNSYM          11               
+#define SHT_LOPROC 0x70000000
+#define SHT_HIPROC 0x7fffffff
+#define SHT_LOUSER 0x80000000
+#define SHT_HIUSER 0xffffffff
+#define SHT_ARM_ATTRIBUTES 0x70000003U 	
+
+//sh_flags 
+
+#define SHF_WRITE             (1 << 0)        /* Writable */
+#define SHF_ALLOC             (1 << 1)        /* Occupies memory during execution */
+#define SHF_EXECINSTR             (1 << 2)        /* Executable */
+#define SHF_MERGE             (1 << 4)        /* Might be merged */
+#define SHF_STRINGS             (1 << 5)        /* Contains nul-terminated strings */
+#define SHF_INFO_LINK             (1 << 6)        /* `sh_info' contains SHT index */
+#define SHF_LINK_ORDER             (1 << 7)        /* Preserve order after combining */
+#define SHF_OS_NONCONFORMING (1 << 8)        /* Non-standard OS specific handling required */
+#define SHF_GROUP             (1 << 9)        /* Section is member of a group.  */
+#define SHF_TLS                     (1 << 10)        /* Section hold thread-local data.  */
+#define SHF_MASKOS             0x0ff00000        /* OS-specific.  */
+#define SHF_MASKPROC             0xf0000000        /* Processor-specific */
+#define SHF_ORDERED             (1 << 30)        /* Special ordering requirement(Solaris).  */
+#define SHF_EXCLUDE             (1 << 31)        /* Section is excluded unless
+                                           referenced or allocated (Solaris).*/
+
+
 
 typedef uint32_t	Elf32_Addr;
 typedef uint16_t	Elf32_Half;
