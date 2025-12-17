@@ -64,6 +64,28 @@ const char *get_type(Elf32_Word t) {
     }
 }
 
+char *get_flags(uint32_t flags, char buf[32]) {
+    int k = 0;
+
+    if (flags & SHF_WRITE)           buf[k++] = 'W';
+    if (flags & SHF_ALLOC)           buf[k++] = 'A';
+    if (flags & SHF_EXECINSTR)       buf[k++] = 'X';
+    if (flags & SHF_MERGE)           buf[k++] = 'M';
+    if (flags & SHF_STRINGS)         buf[k++] = 'S';
+    if (flags & SHF_INFO_LINK)       buf[k++] = 'I';
+    if (flags & SHF_LINK_ORDER)      buf[k++] = 'L';
+    if (flags & SHF_OS_NONCONFORMING)buf[k++] = 'O';
+    if (flags & SHF_GROUP)           buf[k++] = 'G';
+    if (flags & SHF_TLS)             buf[k++] = 'T';
+    if (flags & SHF_MASKOS)          buf[k++] = 'o';
+    if (flags & SHF_MASKPROC)        buf[k++] = 'p';
+    if (flags & SHF_EXCLUDE)         buf[k++] = 'E';
+    buf[k] = '\0';      // pas de '0' -> comme readelf
+
+    return buf;
+}
+
+
 
 
 void afficher_sections(const elf32_t* elf) {
@@ -78,8 +100,8 @@ void afficher_sections(const elf32_t* elf) {
 
     for (int i = 0; i < elf->header.e_shnum; i++) {
         const Elf32_Shdr* section = &elf->sections[i].h_section;
-
-        printf("  [%2d] %-20s %-18s %08x %06x %06x %02x %3u %2u %2u %2x\n", // c les décalage et les nombre de caractere que je prends pour l'instant
+        char buff[32];
+        printf("  [%2d] %-20s %-18s %08x %06x %06x %02x %3s %2u %2u %2x\n", // c les décalage et les nombre de caractere que je prends pour l'instant
             i,
             elf->section_str_table + section->sh_name,                   // nom (plus tard) (une fonction ? / lire dans la string table ?)
             get_type(section->sh_type),                       // type   (ici faudra une fonction pour remplacer le nombre par le bon nom) changer aussi le format dans le print ducoup %-18u par %18-s
@@ -87,7 +109,7 @@ void afficher_sections(const elf32_t* elf) {
             section->sh_offset,                      // décalage
             section->sh_size,                        // taille
             section->sh_entsize,                     // taille entrée
-            section->sh_flags,                       // flags (ici faudra une fonction pour remplacer le nombre par le bon nom) changer aussi le format dans le print ducoup %3u par %3s
+            get_flags(section->sh_flags,buff),                       // flags (ici faudra une fonction pour remplacer le nombre par le bon nom) changer aussi le format dans le print ducoup %3u par %3s
             section->sh_link,                        // lien
             section->sh_info,                        // info
             section->sh_addralign                    // alignement
