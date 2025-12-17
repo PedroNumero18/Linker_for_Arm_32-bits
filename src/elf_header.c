@@ -112,7 +112,7 @@ void affichage_entete(Elf32_Ehdr* header){
     printf("  Nombre entrées programme:          %u\n", header->e_phnum);
     printf("  Taille entrée section:             %u (bytes)\n", header->e_shentsize);
     printf("  Nombre entrées section:            %u\n", header->e_shnum);
-    printf("  Index .shstrtab:                   %u\n", header->e_shstrndx);
+    printf("  Table d'index des chaînes d'en-tête de section: %u\n", header->e_shstrndx);
 }
 
 
