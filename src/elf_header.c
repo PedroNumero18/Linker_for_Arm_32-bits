@@ -16,10 +16,10 @@ void lire_header(FILE* file, elf32_t* elf){
     fseek(file,0,SEEK_SET);
     fread(&(elf->header).e_ident,sizeof((elf->header).e_ident),1,file);
 
-    if(((elf->header).e_ident[EI_MAG0] != ELFMAG0)
-        && ((elf->header).e_ident[EI_MAG1] != ELFMAG1) 
-        && ((elf->header).e_ident[EI_MAG2] != ELFMAG2) 
-        && ((elf->header).e_ident[EI_MAG3] != ELFMAG3)
+    if((elf->header.e_ident[EI_MAG0] != ELFMAG0)
+        || (elf->header.e_ident[EI_MAG1] != ELFMAG1) 
+        || (elf->header.e_ident[EI_MAG2] != ELFMAG2) 
+        || (elf->header.e_ident[EI_MAG3] != ELFMAG3)
     ){
         fprintf(stderr,"Erreur fichier, ce n'est pas un fichier ELF \n");
         exit(1);
