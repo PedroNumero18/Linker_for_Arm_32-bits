@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "elf.h"
 
+char *filename;
+
 void error(const char* msg){
     fprintf(stderr, "%s", msg);
     exit(1);
@@ -21,6 +23,7 @@ int main(int argc,char *argv[]){
     if (!inputFile){
         error("Error opening file\n");
     }
+    filename = argv[1];
 
     lire_header(inputFile, elf);
     affichage_entete(&elf->header);

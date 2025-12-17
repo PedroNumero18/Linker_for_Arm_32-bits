@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
+extern char* filename; //Nom de fichier défini dans le main
 //pris depuis le util.h donnée depuis elf_linker-1.0
 
 #define reverse_2(x) ((((x)&0xFF)<<8)|(((x)>>8)&0xFF))

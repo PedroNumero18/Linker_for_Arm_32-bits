@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdio.h> 
 
+extern char* filename;   // Nom de fichier défini dans le main
+
 //Constantes ELF
 #define EI_MAG0 0
 #define EI_MAG1 1
