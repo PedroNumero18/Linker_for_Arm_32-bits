@@ -79,13 +79,14 @@ typedef struct {
 
 typedef struct{
 	Elf32_Shdr h_section;
-	uint32_t* contenu;
+	uint8_t* contenu;
 } elf32_sections ; 
 
 typedef struct { 
     Elf32_Ehdr header ;
     elf32_sections* sections;
-				
+	char*       section_str_table;	
+
 }elf32_t ;
 
 

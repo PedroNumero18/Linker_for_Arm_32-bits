@@ -28,7 +28,16 @@ void lire_sections(FILE* file, elf32_t* elf) {
         get_32B(&(elf->sections)[i].h_section.sh_info, file);
         get_32B(&(elf->sections)[i].h_section.sh_addralign, file);
         get_32B(&(elf->sections)[i].h_section.sh_entsize, file);
-    }
+    } 
+    for(int i= 0; i < elf->header.e_shnum; i++){
+       elf->sections[i].contenu = malloc(sizeof(uint8_t) * (elf->sections)[i].h_section.sh_size);
+       fseek(file,(elf->sections)[i].h_section.sh_offset,SEEK_SET);
+       for (size_t j = 0; j < (elf->sections[i].h_section.sh_size); j++) {
+            get_8B(&elf->sections[i].contenu[j],file);
+       }
+    } 
+
+    elf->section_str_table = (char *)elf->sections[elf->header.e_shstrndx].contenu;
 }
 
 
@@ -47,7 +56,7 @@ void afficher_sections(const elf32_t* elf) {
 
         printf("  [%2d] %-20s %-18u %08x %06x %06x %02x %3u %2u %2u %2x\n", // c les décalage et les nombre de caractere que je prends pour l'instant
             i,
-            /* section_nom */ "",                   // nom (plus tard) (une fonction ? / lire dans la string table ?)
+            elf->section_str_table + section->sh_name,                   // nom (plus tard) (une fonction ? / lire dans la string table ?)
             section->sh_type,                       // type   (ici faudra une fonction pour remplacer le nombre par le bon nom) changer aussi le format dans le print ducoup %-18u par %18-s
             section->sh_addr,                        // adresse
             section->sh_offset,                      // décalage
