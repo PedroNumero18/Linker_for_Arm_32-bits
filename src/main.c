@@ -1,6 +1,5 @@
 #include <stdlib.h> 
 #include <stdio.h>
-
 #include "elf.h"
 
 void error(const char* msg){
@@ -25,6 +24,8 @@ int main(int argc,char *argv[]){
 
     lire_header(inputFile, elf);
     affichage_entete(&elf->header);
+    lire_sections(inputFile, elf);
+    afficher_sections(elf);
     
     free(elf);
     return 0;

@@ -77,10 +77,18 @@ typedef struct {
 	Elf32_Word	sh_entsize;	/* Size of each entry in section. */
 } Elf32_Shdr;
 
+typedef struct{
+	Elf32_Shdr h_section;
+	uint32_t* contenu;
+} elf32_sections ; 
+
 typedef struct { 
     Elf32_Ehdr header ;
-    Elf32_Shdr* sections; 
+    elf32_sections* sections;
+				
 }elf32_t ;
+
+
 
 /*
 pour l'instant on s'en fout on vera quand on sera sur les sections
@@ -101,8 +109,7 @@ void affichage_entete(Elf32_Ehdr* header);
 //Q2
 void lire_sections(FILE* file,elf32_t* elf);
 
-
-void affichage_sections(elf32_t* elf);
+void afficher_sections(const elf32_t* elf);
 
 
 #endif
