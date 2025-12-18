@@ -9,7 +9,7 @@ HAS_ARMGCC:= $(shell (command -v $(CC) >/dev/null 2>&1 && echo yes) && (command 
 
 CFLAGS   = -D__TEST1__ -nostdlib -static
 CXXFLAGS = -D__TEST2__ -nostdlib -static
-RUST_TARGET = thumbv7m-none-eabi
+RUST_TARGET = armebv7r-none-eabi
 
 ENDIANFLAGS = -mbig-endian
 CFLAGS   += $(ENDIANFLAGS)
