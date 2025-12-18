@@ -38,10 +38,10 @@ Test2: test2.cpp test3.o
 test3.o: test3.s
 	$(AS) $(ASFLAGS) -o $@ $<
 
-Test4: test4.rs
+Test4: test4.rs test3.o
 	$(RUSTC) --target $(RUST_TARGET) $(RUSTFLAGS_NO_STD) -o $@ $<
 
 clean:
-	rm -f $(BINS) *.o
+	rm -f $(BINS) *.o *.out
 
 
