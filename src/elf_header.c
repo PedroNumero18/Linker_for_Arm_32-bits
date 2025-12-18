@@ -4,6 +4,8 @@
 #include "elf.h"
 #include "utils.h"
 
+
+/* Lecture du header */ 
 void lire_header(FILE* file, elf32_t* elf){
     /*
     Semantique à écrire

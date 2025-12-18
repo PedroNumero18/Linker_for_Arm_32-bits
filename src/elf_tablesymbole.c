@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "elf.h"
 
+
 void lire_symbole(FILE* file, elf32_t* elf){
     uint8_t info=0;/*pour mieux gérer le cast plus tard*/
     if (file == NULL || elf == NULL){

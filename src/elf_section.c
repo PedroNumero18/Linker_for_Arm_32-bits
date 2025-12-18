@@ -4,7 +4,6 @@
 #include "elf.h"
 
 
-
 void lire_sections(FILE* file, elf32_t* elf) {
 
    if (file == NULL || elf == NULL){
@@ -40,29 +39,31 @@ void lire_sections(FILE* file, elf32_t* elf) {
     elf->section_str_table = (char *)elf->sections[elf->header.e_shstrndx].contenu;
 }
 
+
 const char *get_type(Elf32_Word t) {
     switch (t) {
-    case SHT_NULL: return "NULL";
+    case SHT_NULL:     return "NULL";
     case SHT_PROGBITS: return "PROGBITS";
-    case SHT_SYMTAB: return "SYMTAB";
-    case SHT_STRTAB: return "STRTAB";
-    case SHT_RELA: return "RELA";
-    case SHT_HASH: return "HASH";
-    case SHT_DYNAMIC: return "DYNAMIC";
-    case SHT_NOTE: return "NOTE";
-    case SHT_NOBITS: return "NOBITS";
-    case SHT_REL: return "REL";
-    case SHT_SHLIB: return "SHLIB";
-    case SHT_DYNSYM: return "DYNSYM";
-    case SHT_LOPROC: return "LOPROC";
-    case SHT_HIPROC: return "HIPROC";
-    case SHT_LOUSER: return "LOUSER";
-    case SHT_HIUSER: return "HIUSER";
+    case SHT_SYMTAB:   return "SYMTAB";
+    case SHT_STRTAB:   return "STRTAB";
+    case SHT_RELA:     return "RELA";
+    case SHT_HASH:     return "HASH";
+    case SHT_DYNAMIC:  return "DYNAMIC";
+    case SHT_NOTE:     return "NOTE";
+    case SHT_NOBITS:   return "NOBITS";
+    case SHT_REL:      return "REL";
+    case SHT_SHLIB:    return "SHLIB";
+    case SHT_DYNSYM:   return "DYNSYM";
+    case SHT_LOPROC:   return "LOPROC";
+    case SHT_HIPROC:   return "HIPROC";
+    case SHT_LOUSER:   return "LOUSER";
+    case SHT_HIUSER:   return "HIUSER";
     case SHT_ARM_ATTRIBUTES: return "ARM_ATTRIBUTES";
     default:
         return "OTHER";
     }
 }
+
 
 char *get_flags(uint32_t flags, char buf[32]) {
     int k = 0;
@@ -86,8 +87,6 @@ char *get_flags(uint32_t flags, char buf[32]) {
 }
 
 
-
-
 void afficher_sections(const elf32_t* elf) {
     if (elf == NULL || (elf->sections) == NULL) {
         fprintf(stderr, "Sections non chargées\n");
@@ -101,15 +100,15 @@ void afficher_sections(const elf32_t* elf) {
     for (int i = 0; i < elf->header.e_shnum; i++) {
         const Elf32_Shdr* section = &elf->sections[i].h_section;
         char buff[32];
-        printf("  [%2d] %-20s %-18s %08x %06x %06x %02x %3s %2u %2u %2x\n", // c les décalage et les nombre de caractere que je prends pour l'instant
+        printf("  [%2d] %-20s %-18s %08x %06x %06x %02x %3s %2u %2u %2x\n", // ce sont les décalages et les nombres de caractère que je prends pour l'instant
             i,
-            elf->section_str_table + section->sh_name,                   // nom (plus tard) (une fonction ? / lire dans la string table ?)
-            get_type(section->sh_type),                       // type   (ici faudra une fonction pour remplacer le nombre par le bon nom) changer aussi le format dans le print ducoup %-18u par %18-s
+            elf->section_str_table + section->sh_name, // nom (plus tard) (une fonction ? / lire dans la string table ?)
+            get_type(section->sh_type),              // type   (ici faudra une fonction pour remplacer le nombre par le bon nom) changer aussi le format dans le print ducoup %-18u par %18-s
             section->sh_addr,                        // adresse
             section->sh_offset,                      // décalage
             section->sh_size,                        // taille
             section->sh_entsize,                     // taille entrée
-            get_flags(section->sh_flags,buff),                       // flags (ici faudra une fonction pour remplacer le nombre par le bon nom) changer aussi le format dans le print ducoup %3u par %3s
+            get_flags(section->sh_flags,buff),       // flags (ici il faudra une fonction pour remplacer le nombre par le bon nom) changer aussi le format dans le print ducoup %3u par %3s
             section->sh_link,                        // lien
             section->sh_info,                        // info
             section->sh_addralign                    // alignement

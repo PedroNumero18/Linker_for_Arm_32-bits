@@ -9,6 +9,7 @@ void error(const char* msg){
     exit(1);
 }
 
+
 int main(int argc,char *argv[]){
     if(argc <2){
         error("le nombre de fichier est incorrrect");
