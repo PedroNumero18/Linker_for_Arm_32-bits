@@ -29,6 +29,7 @@ int main(int argc,char *argv[]){
     affichage_entete(&elf->header);
     lire_sections(inputFile, elf);
     afficher_sections(elf);
+    lire_symbole(inputFile, elf);
     
     free(elf);
     return 0;

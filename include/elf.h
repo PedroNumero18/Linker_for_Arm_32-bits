@@ -79,6 +79,13 @@ extern char* filename;   // Nom de fichier défini dans le main
 #define SHF_EXCLUDE             (1 << 31)        /* Section is excluded unless
                                            referenced or allocated (Solaris).*/
 
+#define STN_UNDEF 0 /*index des symboles non définis et de la premiere entréé*/
+
+/*Quelques constantes pour mieux gérer les infos*/
+#define ELF32_ST_BIND(i) ((i)>>4)
+#define ELF32_ST_TYPE(i) ((i)&0xf)
+#define ELF32_ST_INFO(b,t) (((b)<<4)+((t)&0xf))
+
 
 
 typedef uint32_t	Elf32_Addr;
@@ -117,16 +124,28 @@ typedef struct {
 	Elf32_Word	sh_entsize;	/* Size of each entry in section. */
 } Elf32_Shdr;
 
+
 typedef struct{
 	Elf32_Shdr h_section;
 	uint8_t* contenu;
 } elf32_sections ; 
 
+/*Strucutre des symboles*/
+typedef struct {
+	Elf32_Word st_name;
+	Elf32_Addr st_value;
+	Elf32_Word st_size;
+	unsigned char st_info;
+	unsigned char st_other;
+	Elf32_Half st_shndx;
+} Elf32_Sym;
+
+
 typedef struct { 
     Elf32_Ehdr header ;
     elf32_sections* sections;
 	char*       section_str_table;	
-
+	Elf32_Sym* table_symbole; /* ajout de la table des symboles*/
 }elf32_t ;
 
 
@@ -152,5 +171,7 @@ void lire_sections(FILE* file,elf32_t* elf);
 
 void afficher_sections(const elf32_t* elf);
 
+//Q4
+void lire_symbole(FILE* file, elf32_t* elf);
 
 #endif
