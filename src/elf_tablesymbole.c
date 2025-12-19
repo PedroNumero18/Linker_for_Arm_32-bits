@@ -70,8 +70,7 @@ void lire_symbole(FILE* file, elf32_t* elf){
     //debut de la table
     fseek(file, symtab.sh_offset, SEEK_SET);
 
-
-    //Lecture séquentielle 
+    //lecture
     for (int i = 0; i < nb_symboles; i++){
         get_32B(&elf->table_symbole[i].st_name, file);
         get_32B(&elf->table_symbole[i].st_value, file);
