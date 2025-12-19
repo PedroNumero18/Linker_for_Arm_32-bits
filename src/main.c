@@ -21,6 +21,7 @@ int main(int argc,char *argv[]){
     lire_sections(inputFile, elf);
     afficher_sections(elf);
     lire_symbole(inputFile, elf);
+    afficher_symboles(elf);
     
     free(elf);
     return 0;

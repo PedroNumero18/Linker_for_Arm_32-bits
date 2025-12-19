@@ -180,6 +180,6 @@ void afficher_sections(const elf32_t* elf);
 
 //Table des symboles
 void lire_symbole(FILE* file, elf32_t* elf);
-
+void afficher_symboles(elf32_t* elf);
 
 #endif
