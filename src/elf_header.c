@@ -44,6 +44,7 @@ void affichage_entete(Elf32_Ehdr* header){
     //Faudra changer pour que le texte corresponde mais pour l'instant j'ai ça
     if (!header) error("Erreur d'initialisation d'header\n");
 
+    printf("ELF Header :\n");
     /* Magic */
     printf("  Magique:   ");
     for (int i = 0; i < EI_NIDENT; i++) printf("%02x ", header->e_ident[i]);
@@ -91,6 +92,7 @@ void affichage_entete(Elf32_Ehdr* header){
     printf("  Taille entrée section:             %u (bytes)\n", header->e_shentsize);
     printf("  Nombre entrées section:            %u\n", header->e_shnum);
     printf("  Table d'index des chaînes d'en-tête de section: %u\n", header->e_shstrndx);
+    printf("\n");
 }
 
 

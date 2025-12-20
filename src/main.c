@@ -20,6 +20,8 @@ int main(int argc,char *argv[]){
     affichage_entete(&elf->header);
     lire_sections(inputFile, elf);
     afficher_sections(elf);
+    lire_contenu_sect(inputFile, elf, 5);
+    afficher_contenu_section(elf, "5");
     lire_symbole(inputFile, elf);
     afficher_symboles(elf);
     

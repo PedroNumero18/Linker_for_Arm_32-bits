@@ -88,7 +88,7 @@ void afficher_sections(const elf32_t* elf) {
     if (elf == NULL || (elf->sections) == NULL) error( "Sections non chargées\n");
 
     printf("Il y a %d en-têtes de section, débutant à l'adresse de décalage 0x%x:\n\n",elf->header.e_shnum, elf->header.e_shoff);
-    printf("En-têtes de section :\n");
+    printf("Section Header:\n");
     printf("  [Nr] Nom                  Type               Adr      Décala Taille ES Fan LN Inf Al\n");
 
     for (int i = 0; i < elf->header.e_shnum; i++) {
@@ -108,5 +108,6 @@ void afficher_sections(const elf32_t* elf) {
             section->sh_addralign                    // alignement
         );
     }
+    printf("\n");
 }
 

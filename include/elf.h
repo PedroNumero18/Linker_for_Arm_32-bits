@@ -153,8 +153,8 @@ typedef struct {
 typedef struct { 
   Elf32_Ehdr      header ;
   elf32_sections* sections;
-	char*           section_str_table;	
-	Elf32_Sym*      table_symbole; /* ajout de la table des symboles*/
+  char*           section_str_table;	
+  Elf32_Sym*      table_symbole; /* ajout de la table des symboles*/
 } elf32_t ;
 
 
@@ -177,6 +177,9 @@ void affichage_entete(Elf32_Ehdr* header);
 void lire_sections(FILE* file,elf32_t* elf);
 void afficher_sections(const elf32_t* elf);
 
+//Cotenu section
+void lire_contenu_sect( FILE* f, elf32_t *elf, int index);
+void afficher_contenu_section( elf32_t *elf, char *param);
 
 //Table des symboles
 void lire_symbole(FILE* file, elf32_t* elf);

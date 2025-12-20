@@ -54,6 +54,7 @@ void lire_symbole(FILE* file, elf32_t* elf){
 }
 
 void afficher_symboles(elf32_t* elf){
+    printf("\nTable des symboles:\n");
     printf("Num  Value     Size Type    Bind   Ndx Name\n");
     for (int i = 0; elf->table_symbole[i].st_name != 0 || i == 0; i++){
         Elf32_Sym sym = elf->table_symbole[i];
