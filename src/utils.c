@@ -2,6 +2,8 @@
 
 #include "utils.h"
 
+char* filename;
+
 void error(const char* msg){
     fprintf(stderr, "%s", msg);
     exit(1);

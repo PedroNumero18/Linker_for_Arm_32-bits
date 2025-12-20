@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <stdint.h>
 
-extern char* filename; //Nom de fichier défini dans le main
-
 void error(const char* msg);
 
 //pris depuis le util.h donnée depuis elf_linker-1.0
