@@ -10,16 +10,15 @@ DISTRIBUTION=Rendus_PROG5_2025-2026_groupe4.tar.gz
 SRC=$(wildcard $(SRC_DIR)*.c)
 OBJS=$(patsubst $(SRC_DIR)%.c, $(BIN_DIR)%.o, $(SRC))
 
-.PHONY: All clean 
+.PHONY: All clean dist
 
 All: $(TARGET)
 
-dist:
-	$(shell make clean)
-	$(shell tar czvf $(DISTRIBUTION) *)
+dist: clean
+	tar czvf $(DISTRIBUTION) *
 
 $(BIN_DIR):
-	mkdir -p bin
+	mkdir -p $(BIN_DIR)
 
 $(TARGET): $(OBJS)
 	$(CC) -o $@ $^

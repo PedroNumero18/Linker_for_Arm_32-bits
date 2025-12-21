@@ -18,25 +18,26 @@ void print_flags(const char* nom){
 }
 
 int main(int argc,char *argv[]){
-    int opt, h_flag, S_flag, s_flag;
+    int opt, a_flag, h_flag, S_flag, g_flag, s_flag;
     struct option longOpts[]={
-        {"header", required_argument, 0, 'h'},
+        {"All",     required_argument, 0, 'a'},
+        {"header",  required_argument, 0, 'h'},
         {"section", required_argument, 0 ,'S'},
-        {"symbol", required_argument, 0, 's'},
-        {NULL, no_argument, NULL, 0},
+        {"symbol",  required_argument, 0, 's'},
+        {NULL, 0, NULL, 0}
     };
     
-    while( ( opt = getopt_long(argc, argv, "hSs", longOpts, &optind) ) != -1 ){
+    while( ( opt = getopt_long(argc, argv, "ahSg:s", longOpts, NULL) ) != -1 ){
         switch(opt){
+            case 'a': a_flag = 1; break;
             case 'h': h_flag = 1; break;
             case 'S': S_flag = 1; break;
+            case 'g': g_flag = 1; break;
             case 's': s_flag = 1; break;
-            case '?':
-            default: print_flags(argv[0]); error("mauvais flag"); break;
+            default: print_flags(argv[0]); error("cette option n'existe pas !!!"); break;
         }
     }
     if (!h_flag && !S_flag && !s_flag) {print_flags(argv[0]); error("aucune option fournie");}
-
     if (optind != argc-1) error("le nombre de fichier est incorrrect");
 
     FILE* inputFile = fopen(argv[optind],"rb");
@@ -46,15 +47,20 @@ int main(int argc,char *argv[]){
     if(!elf)error("Error allocating memory to pointer\n");
     
     filename = argv[1];
-
-    lire_header(inputFile, elf);
-    affichage_entete(&elf->header);
-    lire_sections(inputFile, elf);
-    afficher_sections(elf);
-    lire_contenu_sect(inputFile, elf, 5);
-    afficher_contenu_section(elf, "5");
-    lire_symbole(inputFile, elf);
-    afficher_symboles(elf);
+    if(h_flag || a_flag){
+        lire_header(inputFile, elf);
+        affichage_entete(&elf->header);
+    }
+    if(S_flag || a_flag){
+        lire_sections(inputFile, elf);
+        afficher_sections(elf);
+        lire_contenu_sect(inputFile, elf, 5);
+        afficher_contenu_section(elf, "5");
+    }
+    if(s_flag || a_flag){
+        lire_symbole(inputFile, elf);
+        afficher_symboles(elf);
+    }
     
     free(elf);
     return 0;

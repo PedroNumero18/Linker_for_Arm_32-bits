@@ -143,9 +143,9 @@ typedef struct {
 	Elf32_Word    st_name;
 	Elf32_Addr    st_value;
 	Elf32_Word    st_size;
+	Elf32_Half    st_shndx;
 	unsigned char st_info;
 	unsigned char st_other;
-	Elf32_Half    st_shndx;
 } Elf32_Sym;
 
 
@@ -153,8 +153,8 @@ typedef struct {
 typedef struct { 
   Elf32_Ehdr      header ;
   elf32_sections* sections;
-  char*           section_str_table;	
   Elf32_Sym*      table_symbole; /* ajout de la table des symboles*/
+  char*           section_str_table;
 } elf32_t ;
 
 
