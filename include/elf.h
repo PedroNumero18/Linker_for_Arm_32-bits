@@ -89,11 +89,18 @@ extern char* filename;   // Nom de fichier défini dans le main
 #define ELF32_ST_TYPE(i) ((i)&0xf)
 #define ELF32_ST_INFO(b,t) (((b)<<4)+((t)&0xf))
 
+/*  gérer les infos lors des reimplemenntationns */
+#define ELF32_R_SYM(i) ((i)>>8)
+#define ELF32_R_TYPE(i) ((unsigned char)(i))
+#define ELF32_R_INFO(s,t) (((s)<<8)+(unsigned char)(t))
+
 
 typedef uint32_t	Elf32_Addr;
 typedef uint16_t	Elf32_Half;
 typedef uint32_t	Elf32_Off;
 typedef uint32_t	Elf32_Word;
+typedef int32_t	    Elf32_Sword;/*categorie supplementaire pour les reimplementations*/
+
 
 
 /* Header global du fichier */
@@ -143,18 +150,32 @@ typedef struct {
 	Elf32_Word    st_name;
 	Elf32_Addr    st_value;
 	Elf32_Word    st_size;
-	Elf32_Half    st_shndx;
 	unsigned char st_info;
 	unsigned char st_other;
+	Elf32_Half    st_shndx;
 } Elf32_Sym;
+
+/*Structure pour les reimplementations*/
+typedef struct {
+ Elf32_Addr r_offset;
+ Elf32_Word r_info;
+} Elf32_Rel;
+
+typedef struct {
+ Elf32_Addr r_offset;
+ Elf32_Word r_info;
+ Elf32_Sword r_addend;
+} Elf32_Rela;
 
 
 /*Structure represantant le contenu du fichier ELF*/
 typedef struct { 
   Elf32_Ehdr      header ;
   elf32_sections* sections;
+  char*           section_str_table;	
   Elf32_Sym*      table_symbole; /* ajout de la table des symboles*/
-  char*           section_str_table;
+  Elf32_Rel* 	  rel_table;
+  Elf32_Rela* 	  RELA_table;
 } elf32_t ;
 
 
@@ -184,5 +205,9 @@ void afficher_contenu_section( elf32_t *elf, char *param);
 //Table des symboles
 void lire_symbole(FILE* file, elf32_t* elf);
 void afficher_symboles(elf32_t* elf);
+
+//REIMPLEMENTATION
+void lire_Reimple(FILE* file, elf32_t* elf);
+void afficher_Reimple(elf32_t* elf);
 
 #endif
