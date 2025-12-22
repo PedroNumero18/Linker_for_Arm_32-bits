@@ -10,9 +10,9 @@ début de la lecture de l'entête du format ELF
 
 ### Mardi 16 Décembre 2025:  
 ```{text}
-finalisation de la lecture et l'affichage de l'entête du fichier au format ELF passer en paramètre 
-implémentation de fichiers de tests utilisants des compilateur différent  
-création de la fonction principal du projet
+finalisation de la lecture et l'affichage de l'entête du fichier au format ELF passée en paramètre 
+implémentation de fichiers de tests utilisant des compilateurs différents  
+création de la fonction principale du projet
 modification du fichier elf_header.h en elf.h et du type ELF et elf32_t
 ```
 
@@ -26,6 +26,6 @@ implémentation de l'affichage du contenu d’une section
 
 ### Jeudi 18 Décembre 2025:  
 ```{text}
-début de l'implémentation de la table des symbole
-formattage du code  pour une meilleur lisibilité
+début de l'implémentation de la table des symboles 
+formatage du code pour une meilleure lisibilité
 ```
