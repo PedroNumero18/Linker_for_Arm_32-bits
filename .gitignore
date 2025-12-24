@@ -2,4 +2,5 @@ bin/
 *.o
 *.out
 linker
+elfReader
 Test*

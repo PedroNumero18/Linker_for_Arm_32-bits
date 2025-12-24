@@ -31,7 +31,7 @@ void lire_symbole(FILE* file, elf32_t* elf){
 
     //nombre de symboles 
     int nb_symboles = symtab.sh_size / symtab.sh_entsize;
-
+    
     //Malloc
     elf->table_symbole = malloc(sizeof(Elf32_Sym) * nb_symboles);
     if (elf->table_symbole == NULL) error("Erreur malloc table des symboles\n");

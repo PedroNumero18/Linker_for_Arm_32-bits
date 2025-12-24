@@ -83,16 +83,17 @@ void afficher_Reimple(elf32_t* elf){
     switch (elf->header.e_type) {
         case ET_REL:  
             for (int i = 0; i < nb_rel; i++){
+                unsigned char ELF32_type = ELF32_R_TYPE(elf->rel_table[i].r_info);
                 int indice =(int) (elf->rel_table[i].r_offset - elf->header.e_shoff);
-                printf(" cible :%s  ",elf->section_str_table + &elf->sections[indice].h_section);
-                if (ELF32_R_TYPE(elf->rel_table[i].r_info)==0 || 
-                (2<=ELF32_R_TYPE(elf->rel_table[i].r_info)<=11)||
-                (24<=ELF32_R_TYPE(elf->rel_table[i].r_info)<=26)||
-                (28<=ELF32_R_TYPE(elf->rel_table[i].r_info)<=31)||
-                ELF32_R_TYPE(elf->rel_table[i].r_info)==38 ||
-                (40<=ELF32_R_TYPE(elf->rel_table[i].r_info)<=99)||
-                (102<=ELF32_R_TYPE(elf->rel_table[i].r_info)<=111)||
-                (129<=ELF32_R_TYPE(elf->rel_table[i].r_info)<=159)){
+                printf(" cible :%s  ",elf->section_str_table + elf->sections[indice].h_section.sh_name);
+                if  (ELF32_type==0                      || 
+                    (2<=ELF32_type && ELF32_type<=11)   ||
+                    (24<=ELF32_type && ELF32_type<=26)  ||
+                    (28<=ELF32_type && ELF32_type<=31)  ||
+                    ELF32_type==38                      ||
+                    (40<=ELF32_type && ELF32_type<=99)  ||
+                    (102<=ELF32_type && ELF32_type<=111)||
+                    (129<=ELF32_type && ELF32_type<=159)){
                     printf("Type : STATIC   ");
                 } 
                 else{
@@ -105,7 +106,9 @@ void afficher_Reimple(elf32_t* elf){
             }
             break;
         case ET_EXEC: 
+            printf("ET_EXEC");
         case ET_DYN:
+            printf("ET_DYN");
             //plus tard
             break;
         default:      
