@@ -20,7 +20,7 @@ void print_flags(const char* nom){
 
 int main(int argc,char *argv[]){
     int opt;
-    int a_flag, h_flag, S_flag, s_flag, r_flag;
+    int a_flag = 0, h_flag = 0, S_flag = 0, s_flag = 0, r_flag = 0;
     
     while( ( opt = getopt(argc, argv, "ahSsr") ) != -1 ){
         switch(opt){

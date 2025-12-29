@@ -83,6 +83,36 @@ extern char* filename;   // Nom de fichier défini dans le main
 
 #define STN_UNDEF 0 /*index des symboles non définis et de la premiere entréé*/
 
+//Types st_info
+#define STT_NOTYPE   0 
+#define STT_OBJECT   1
+#define STT_FUNC     2  
+#define STT_SECTION  3 
+#define STT_FILE     4  
+#define STT_COMMON   5 
+#define STT_TLS      6  
+#define STT_NUM      7  
+#define STT_LOOS     10 
+#define STT_HIOS     12
+#define STT_LOPROC   13
+#define STT_HIPROC   15
+
+//Bind st_info
+#define STB_LOCAL    0 
+#define STB_GLOBAL   1  
+#define STB_WEAK     2  
+#define STB_NUM      3
+#define STB_LOOS     10
+#define STB_HIOS     12
+#define STB_LOPROC   13
+#define STB_HIPROC   15
+
+//Visibilité st_other
+#define STV_DEFAULT   0
+#define STV_INTERNAL  1
+#define STV_HIDDEN    2
+#define STV_PROTECTED 3
+
 
 /* Quelques constantes pour mieux gérer les infos */
 #define ELF32_ST_BIND(i) ((i)>>4)
@@ -174,6 +204,7 @@ typedef struct {
   elf32_sections* sections;
   char*           section_str_table;	
   Elf32_Sym*      table_symbole; /* ajout de la table des symboles*/
+  uint32_t        nb_symboles;
   Elf32_Rel* 	  rel_table;
   Elf32_Rela* 	  RELA_table;
 } elf32_t ;
@@ -204,6 +235,9 @@ void afficher_contenu_section( elf32_t *elf, char *param);
 
 //Table des symboles
 void lire_symbole(FILE* file, elf32_t* elf);
+const char* get_type_string(unsigned char info);
+const char* get_bind_string(unsigned char info);
+const char* get_ndx_string(Elf32_Half shndx);
 void afficher_symboles(elf32_t* elf);
 
 //REIMPLEMENTATION
