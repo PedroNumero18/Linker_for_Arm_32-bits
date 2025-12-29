@@ -21,10 +21,10 @@ void lire_Reimple(FILE* file, elf32_t* elf){
         }
     }
     if (index_Rela == -1){
-        error(" Pas de RELA section Well Woopie Diddoo");
+        error(" Pas de RELA section Well Woopie Diddoo \n");
     }
     if (index_rel == -1){
-        error(" Aucune REL table mon Biquet");
+        error(" Aucune REL table mon Biquet \n");
     }
     /*OCCUPONS  NOUS DE LA RELA TABLE*/
     Elf32_Shdr RELA_table = elf->sections[index_Rela].h_section;

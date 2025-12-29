@@ -19,7 +19,8 @@ void print_flags(const char* nom){
 }
 
 int main(int argc,char *argv[]){
-    int opt, a_flag, h_flag, S_flag, s_flag, r_flag;
+    int opt;
+    int a_flag, h_flag, S_flag, s_flag, r_flag;
     
     while( ( opt = getopt(argc, argv, "ahSsr") ) != -1 ){
         switch(opt){
@@ -43,14 +44,13 @@ int main(int argc,char *argv[]){
     lire_header(inputFile, elf);
     if(h_flag || a_flag){
         affichage_entete(&elf->header);
-        return 0;
     }
 
     lire_sections(inputFile, elf);
     if(S_flag || a_flag){
         afficher_sections(elf);
-        lire_contenu_sect(inputFile, elf, 5);
-        afficher_contenu_section(elf, "5");
+        lire_contenu_sect(inputFile, elf, 6); // faudra mettre l'indice de la section qu'on veut afficher
+        afficher_contenu_section(elf, "6"); // faudra mettre l'indice de la section qu'on veut afficher et pas juste 5
     }
     if(s_flag || a_flag){
         lire_header(inputFile, elf);

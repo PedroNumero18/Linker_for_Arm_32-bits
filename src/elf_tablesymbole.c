@@ -8,10 +8,10 @@ void lire_symbole(FILE* file, elf32_t* elf){
     if (file == NULL || elf == NULL) error("Erreur : fichier ou structure ELF NULL\n");
 
     //et la en +
-    //if (elf->header.e_ident[EI_CLASS] != ELFCLASS32){
-    //    fprintf(stderr,"Erreur : ELF64 non supporté\n");
-    //    exit(1);
-    //}
+    if (elf->header.e_ident[EI_CLASS] != ELFCLASS32){
+        fprintf(stderr,"Erreur : ELF64 non supporté\n");
+        exit(1);
+    }
 
     //section SHT_SYMTAB
     int index_symtab = -1;
@@ -49,8 +49,8 @@ void lire_symbole(FILE* file, elf32_t* elf){
         get_16B(&elf->table_symbole[i].st_shndx, file);
     }
     //ici le changement
-    //int index_strtab = symtab.sh_link;
-    //elf->section_str_table = (char*) elf->sections[index_strtab].contenu;
+    int index_strtab = symtab.sh_link;
+    elf->section_str_table = (char*) elf->sections[index_strtab].contenu;
 }
 
 void afficher_symboles(elf32_t* elf){
