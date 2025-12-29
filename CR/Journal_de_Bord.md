@@ -29,3 +29,7 @@ implémentation de l'affichage du contenu d’une section
 début de l'implémentation de la table des symboles 
 formatage du code pour une meilleure lisibilité
 ```
+
+### Pendant les vacances :
+```{text}
+```

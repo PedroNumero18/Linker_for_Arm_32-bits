@@ -3,4 +3,4 @@ bin/
 *.out
 linker
 elfReader
-Test*
+*.elf

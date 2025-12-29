@@ -19,29 +19,29 @@ ASFLAGS  = -EB
 
 BINS =
 ifneq ($(HAS_ARMGCC),)
-BINS += Test1 Test2
+BINS += Test1.elf Test2.elf
 endif
 ifneq ($(HAS_RUSTC),)
-BINS += Test4
+BINS += Test4.elf
 endif
 
 all: $(BINS)
 
 .PHONY: all clean
 
-Test1: test1.c test3.o
+Test1.elf: test1.c test3.o
 	$(CC) $(CFLAGS) -o $@ $^
 
-Test2: test2.cpp test3.o
+Test2.elf: test2.cpp test3.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 test3.o: test3.s
 	$(AS) $(ASFLAGS) -o $@ $<
 
-Test4: test4.rs test3.o
+Test4.elf: test4.rs test3.o
 	$(RUSTC) --target $(RUST_TARGET) $(RUSTFLAGS_NO_STD) -o $@ $<
 
 clean:
-	rm -f $(BINS) *.o *.out
+	rm -f $(BINS) *.o *.out *.elf
 
 
