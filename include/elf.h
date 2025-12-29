@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdio.h> 
 
-extern char* filename;   // Nom de fichier défini dans le main
+extern char* filename;   //Nom de fichier défini dans le main
 
 
 //Constantes ELF
@@ -91,21 +91,12 @@ extern char* filename;   // Nom de fichier défini dans le main
 #define STT_FILE     4  
 #define STT_COMMON   5 
 #define STT_TLS      6  
-#define STT_NUM      7  
-#define STT_LOOS     10 
-#define STT_HIOS     12
-#define STT_LOPROC   13
-#define STT_HIPROC   15
 
 //Bind st_info
 #define STB_LOCAL    0 
 #define STB_GLOBAL   1  
 #define STB_WEAK     2  
-#define STB_NUM      3
-#define STB_LOOS     10
-#define STB_HIOS     12
-#define STB_LOPROC   13
-#define STB_HIPROC   15
+
 
 //Visibilité st_other
 #define STV_DEFAULT   0
@@ -206,18 +197,10 @@ typedef struct {
   Elf32_Sym*      table_symbole; /* ajout de la table des symboles*/
   uint32_t        nb_symboles;
   Elf32_Rel* 	  rel_table;
+  uint32_t        nb_rel;
   Elf32_Rela* 	  RELA_table;
+  uint32_t        nb_RELA;
 } elf32_t ;
-
-
-/*unsigned
-pour l'instant on s'en fout on vera quand on sera sur les sections
-typedef struct {
-    Elf32_Ehdr  header;
-    Elf32_Shdr* sections;
-    char*       section_str_table;
-} ELF;
-*/
 
 
 //Header 

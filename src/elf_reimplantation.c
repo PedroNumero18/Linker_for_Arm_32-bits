@@ -4,114 +4,103 @@
 #include "utils.h"
 #include "elf.h"
 
-void lire_Reimple(FILE* file, elf32_t* elf){
-    if (file == NULL || elf == NULL) error("Erreur : fichier ou structure ELF NULL\n");
-    int index_Rela = -1, index_rel = -1;
-    for (int i = 0; i < elf->header.e_shnum; i++){
-        if (elf->sections[i].h_section.sh_type == SHT_RELA){
-            index_Rela = i;
-            i++;
-        }
-        else if(elf->sections[i].h_section.sh_type == SHT_REL){
-            index_rel = i;
-            i++;
-        }
-        else{
-            i++;
-        }
+const char* get_rel_type(uint32_t r_info){
+    unsigned char type = ELF32_R_TYPE(r_info);
+    switch(type){
+        case 0: return "NONE";
+        case 2 ... 11: return "STATIC";
+        default: return "UNKNOWN";
     }
-    if (index_Rela == -1){
-        error(" Pas de RELA section Well Woopie Diddoo \n");
-    }
-    if (index_rel == -1){
-        error(" Aucune REL table mon Biquet \n");
-    }
-    /*OCCUPONS  NOUS DE LA RELA TABLE*/
-    Elf32_Shdr RELA_table = elf->sections[index_Rela].h_section;
-    int nb_RELA = RELA_table.sh_size / RELA_table.sh_entsize;//nombre d'eleemnts
-    elf->RELA_table = malloc(sizeof(Elf32_Rela) * nb_RELA);
-    if (!elf->RELA_table) {
-        free(elf->RELA_table);
-        error("It’s a me, Rela_pas_de_Malloc!");
-    }
-    fseek(file, RELA_table.sh_offset, SEEK_SET);//debut des RELAAAAhhh
-    for (int i = 0; i < nb_RELA; i++) {
-        get_32B(&elf->RELA_table[i].r_offset, file);
-        get_32B(&elf->RELA_table[i].r_info,   file);
-        get_32B((uint32_t *)&elf->RELA_table[i].r_addend, file);
-    }//on remplit nos champs
-    
-
-    /*Time to think about some Rels*/
-    Elf32_Shdr rel_table = elf->sections[index_rel].h_section;    
-    
-    int nb_rel = rel_table.sh_size / rel_table.sh_entsize;
-    elf->rel_table = malloc(sizeof(Elf32_Sym) * nb_rel);
-    if (elf->rel_table == NULL){
-        free(elf->rel_table);
-        error("REL TABLE pas de malloc bon bein Chaos Control! ");
-    }
-    fseek(file, rel_table.sh_offset, SEEK_SET);//debut des rel
-    for (int i = 0; i < nb_rel; i++) {
-        get_32B(&elf->rel_table[i].r_offset, file);
-        get_32B(&elf->rel_table[i].r_info,   file);
-    }//on remplit nos champs
-
 }
 
-void afficher_Reimple(elf32_t* elf){
+uint32_t get_rel_sym(uint32_t r_info){
+    return ELF32_R_SYM(r_info);
+}
+
+
+void lire_Reimple(FILE* file, elf32_t* elf){
+    if (file == NULL || elf == NULL) error("Erreur : fichier ou structure ELF NULL\n");
+
+    //recherche section rel et rela
     int index_Rela = -1, index_rel = -1;
+
     for (int i = 0; i < elf->header.e_shnum; i++){
-        if (elf->sections[i].h_section.sh_type == SHT_RELA){
-            index_Rela = i;
-            i++;
-        }
-        else if(elf->sections[i].h_section.sh_type == SHT_REL){
-            index_rel = i;
-            i++;
-        }
-    }
-    Elf32_Shdr RELA_table = elf->sections[index_Rela].h_section;
-    int nb_RELA = RELA_table.sh_size / RELA_table.sh_entsize;//nombre d'eleemnts
-    Elf32_Shdr rel_table = elf->sections[index_rel].h_section;    
-    int nb_rel = rel_table.sh_size / rel_table.sh_entsize;//same thing brochacho
-    if (nb_rel == 0 && nb_RELA == 0 ){
-        printf("pas de reimplementation\n");
-        return;
+        uint32_t type = elf->sections[i].h_section.sh_type;
+        if (type == SHT_REL)   index_rel = i;
+        if (type == SHT_RELA)  index_Rela = i;
     }
 
-    switch (elf->header.e_type) {
-        case ET_REL:  
-            for (int i = 0; i < nb_rel; i++){
-                unsigned char ELF32_type = ELF32_R_TYPE(elf->rel_table[i].r_info);
-                int indice =(int) (elf->rel_table[i].r_offset - elf->header.e_shoff);
-                printf(" cible :%s  ",elf->section_str_table + elf->sections[indice].h_section.sh_name);
-                if  (ELF32_type==0                      || 
-                    (2<=ELF32_type && ELF32_type<=11)   ||
-                    (24<=ELF32_type && ELF32_type<=26)  ||
-                    (28<=ELF32_type && ELF32_type<=31)  ||
-                    ELF32_type==38                      ||
-                    (40<=ELF32_type && ELF32_type<=99)  ||
-                    (102<=ELF32_type && ELF32_type<=111)||
-                    (129<=ELF32_type && ELF32_type<=159)){
-                    printf("Type : STATIC   ");
-                } 
-                else{
-                    printf("");//faire plus tard;
-                }
-                printf("Index %c \n",ELF32_R_SYM(elf->rel_table[i].r_info));
-            }
-            for (int i = 0; i < nb_RELA; i++){
+    //init
+    elf->rel_table = NULL;
+    elf->RELA_table = NULL;
+    elf->nb_rel = 0;
+    elf->nb_RELA = 0;
 
+    //rela
+    if (index_Rela != -1){
+        Elf32_Shdr s = elf->sections[index_Rela].h_section;
+        int nb = s.sh_size / s.sh_entsize;
+        if (nb > 0) {
+            elf->RELA_table = malloc(sizeof(Elf32_Rela) * nb);
+            elf->nb_RELA = 0;
+            if (!elf->RELA_table) error("Impossible d'allouer RELA\n");
+            fseek(file, s.sh_offset, SEEK_SET);
+            for (int i = 0; i < nb; i++){
+                get_32B(&elf->RELA_table[i].r_offset, file);
+                get_32B(&elf->RELA_table[i].r_info,   file);
+                get_32B((uint32_t*)&elf->RELA_table[i].r_addend, file);
             }
-            break;
-        case ET_EXEC: 
-            printf("ET_EXEC");
-        case ET_DYN:
-            printf("ET_DYN");
-            //plus tard
-            break;
-        default:      
-            break;
+            elf->nb_RELA = nb;
+        }
+    }
+
+    //rel
+    if (index_rel != -1){
+        Elf32_Shdr s = elf->sections[index_rel].h_section;
+        int nb = s.sh_size / s.sh_entsize;
+        if (nb > 0) {
+            elf->rel_table = malloc(sizeof(Elf32_Rel) * nb);
+            if (!elf->rel_table) error("Impossible d'allouer REL\n");
+            fseek(file, s.sh_offset, SEEK_SET);
+            for (int i = 0; i < nb; i++){
+                get_32B(&elf->rel_table[i].r_offset, file);
+                get_32B(&elf->rel_table[i].r_info, file);
+            }
+            elf->nb_rel = nb;
+        }
+    }
+}
+
+
+void afficher_Reimple(elf32_t* elf){
+    if (!elf) return;
+
+    //rel
+    if (elf->rel_table && elf->nb_rel > 0){
+        printf("\nTable REL:\n");
+        for (uint32_t i = 0; i < elf->nb_rel; i++){
+            Elf32_Rel r = elf->rel_table[i];
+            printf("Offset: %08x  Type: %s  Sym: %u\n",
+                r.r_offset,
+                get_rel_type(r.r_info),
+                get_rel_sym(r.r_info));
+        }
+    } else {
+        printf("Aucune table REL présente.\n");
+    }
+
+    //rela
+    if (elf->RELA_table && elf->nb_RELA > 0){
+        printf("\nTable RELA:\n");
+        for (uint32_t i = 0; i < elf->nb_RELA; i++){
+            Elf32_Rela r = elf->RELA_table[i];
+            printf("Offset: %08x  Type: %s  Sym: %u  Addend: %d\n",
+                r.r_offset,
+                get_rel_type(r.r_info),
+                get_rel_sym(r.r_info),
+                r.r_addend);
+        }
+    } else {
+        printf("Aucune table RELA présente.\n");
     }
 }

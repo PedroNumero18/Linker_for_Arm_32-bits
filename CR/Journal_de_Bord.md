@@ -32,4 +32,7 @@ formatage du code pour une meilleure lisibilité
 
 ### Pendant les vacances :
 ```{text}
+Finalisation table symbole (modif pour les String) et vérification pour savoir si elle marche
+quelques modifs mineur sur le main
+modif table Reimpl (a tester avec un fichier avec des readresage a faire)
 ```
