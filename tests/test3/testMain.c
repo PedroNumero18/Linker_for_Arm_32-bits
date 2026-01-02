@@ -1,12 +1,9 @@
-#ifndef __TEST1__
-#define __TEST1__
+#include "test3.h"
 
-#include "header_Test1_2.h"
-
+extern int add(int a, int b);
 
 int main(void){
     int a = 420, b = 40;
-    int res = a + b; 
+    int res = add(a, b); 
     return res;
 }
-#endif

@@ -4,3 +4,4 @@ bin/
 linker
 elfReader
 *.elf
+*.log

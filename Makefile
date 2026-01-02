@@ -15,6 +15,9 @@ OBJS=$(patsubst $(SRC_DIR)/%.c, $(BIN_DIR)/%.o, $(SRC))
 
 All: $(TARGET)
 
+test:$(TARGET)
+
+
 dist: clean
 	tar czvf $(DISTRIBUTION) *
 
