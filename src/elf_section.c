@@ -146,6 +146,20 @@ void lire_contenu_sect( FILE* f, elf32_t *elf, int index) {
     fread(section->contenu, 1, section->h_section.sh_size, f);
 }
 
+int get_section_ind_par_nom(const elf32_t *elf, const char *name) {
+    if (elf == NULL || name == NULL) return -1;
+    for (int i = 0; i < elf->header.e_shnum; i++) {
+        const char *section_name =
+            elf->section_str_table + elf->sections[i].h_section.sh_name;
+
+        if (strcmp(section_name, name) == 0) {
+            return i;
+        }
+    }
+    return -1; //pas de section
+}
+
+
 void afficher_contenu_section(elf32_t *elf, char *param) {
     int index_section = -1;
 
