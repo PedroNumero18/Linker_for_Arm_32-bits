@@ -1,5 +1,4 @@
 # Makefile for ARM assembly examples
-
 # Assembler and linker
 AS = arm-none-eabi-as
 LD = arm-none-eabi-ld
