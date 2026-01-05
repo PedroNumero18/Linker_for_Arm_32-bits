@@ -5,7 +5,7 @@ INCLUDE_DIR=include
 CC=clang
 CFLAGS=-Wall -Werror -Wextra -I$(INCLUDE_DIR) 
 
-TARGET=elfReader 
+TARGET=elfReader linker
 TEST=test_elfReader.py
 DISTRIBUTION=Rendus_PROG5_2025-2026_groupe4.tar.gz
 
@@ -37,6 +37,7 @@ $(BIN_DIR)/%.o: $(SRC_DIR)/%.c | $(BIN_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 elfReader.o: $(SRC_DIR)/elfReader.c $(INCLUDE_DIR)/utils.h $(INCLUDE_DIR)/elf.h
+linker.o: $(SRC_DIR)/elfReader.c $(INCLUDE_DIR)/utils.h $(INCLUDE_DIR)/elf.h
 
 distclean:
 	rm -rf $(BIN_DIR) $(TARGET) $(DISTRIBUTION) test_elfReader_results.log
