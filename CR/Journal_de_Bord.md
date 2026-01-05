@@ -36,3 +36,9 @@ Finalisation table symbole (modif pour les String) et vérification pour savoir 
 quelques modifs mineur sur le main
 modif table Reimpl (a tester avec un fichier avec des readresage a faire)
 ```
+
+### Lundi 05 Janvier 2025
+``` {text}
+Préparation de la diapo
+
+```

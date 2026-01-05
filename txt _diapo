@@ -1,0 +1,34 @@
+Luckas
+Diapo:
+1: Ecran titre
+2: Sommaire:
+2.5: Structure utilisée!!!!!!!!!!!!!! 
+4: partie 1 (nb de diapo ind )
+5: header (expliqué vite fait le header)
+
+
+Akin
+3: petite definition readelf / fichier elf et linker
+6: section et contenu (pour avoir la table symbole expliqué)
+
+
+
+Miranto
+7: symbole (expliqué le plus important notament les if et def et autre)
+8: rel (on y passe vite fait)
+9: fonction annexe utilisée pour nous aider
+10: partie 2 (fusion elf)
+
+
+
+
+//Plus tard
+
+
+11: procédé utilisait pour fusionner les section (creer, ignorer, concatenner)
+12: fusion symbole ( même principe on explique vite fait)
+13: fusion table RELA (même principe tu as capté au bout d'un moment mon biquet)
+14: production finale (+ demo sur pc à chaque fois flemmard)
+15: TEST (python et autre)
+16: Timeline des réalisation (jdb)
+17: Conclusion (+ Question ?)
