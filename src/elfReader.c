@@ -38,7 +38,7 @@ int main(int argc,char *argv[]){
     FILE* inputFile = fopen(filename,"rb");
     if (!inputFile)error("Error opening file\n");
 
-    elf32_t* elf = malloc(sizeof(elf32_t));
+    elf32_t* elf = elf_init();
     if(!elf)error("Error allocating memory to pointer\n");
     
     lire_header(inputFile, elf);
@@ -68,6 +68,6 @@ int main(int argc,char *argv[]){
         afficher_Reimple(elf);
     }
 
-    free(elf);
+    elf_free(elf);
     return 0;
 }

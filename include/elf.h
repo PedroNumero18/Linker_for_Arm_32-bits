@@ -176,11 +176,13 @@ typedef struct {
 	Elf32_Half    st_shndx;
 } Elf32_Sym;
 
+
 /*Structure pour les reimplementations*/
 typedef struct {
  Elf32_Addr r_offset;
  Elf32_Word r_info;
 } Elf32_Rel;
+
 
 typedef struct {
  Elf32_Addr r_offset;
@@ -198,9 +200,6 @@ typedef struct {
  } elf32_fusion_sections;
 
 
-
-
-
 /*Structure represantant le contenu du fichier ELF*/
 typedef struct { 
   Elf32_Ehdr      header ;
@@ -214,6 +213,9 @@ typedef struct {
   uint32_t        nb_RELA;
 } elf32_t ;
 
+//gestion de structure
+elf32_t* elf_init();
+void elf_free(elf32_t* elf);
 
 //Header 
 void lire_header(FILE* file, elf32_t* elf);

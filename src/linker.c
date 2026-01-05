@@ -19,5 +19,6 @@ void print_flags(const char* nom){
 }
 
 int main(int argc, char** argv){
-    return 0;
+    printf("%s",argv[0]);
+    return argc;
 }

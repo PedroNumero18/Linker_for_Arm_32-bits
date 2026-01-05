@@ -19,7 +19,8 @@ all:
 
 release: $(TARGET)
 
-debug: CFLAGS+=-g $(TARGET)
+debug: CFLAGS+=-g 
+debug: $(TARGET)
 
 test: release
 	./$(TEST)
@@ -30,14 +31,14 @@ dist: distclean
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
-$(TARGET): $(OBJS)
-	$(CC) -o $@ $^
+elfReader: $(BIN_DIR)/elfReader.o $(BIN_DIR)/elf_header.o $(BIN_DIR)/elf_section.o $(BIN_DIR)/elf_tableSymbole.o $(BIN_DIR)/elf_reimplantation.o $(BIN_DIR)/elf.o $(BIN_DIR)/utils.o
+	$(CC) $(CFLAGS) -o $@ $^
+
+linker: $(BIN_DIR)/linker.o $(BIN_DIR)/elf_header.o $(BIN_DIR)/elf_section.o $(BIN_DIR)/elf_tableSymbole.o $(BIN_DIR)/elf_reimplantation.o $(BIN_DIR)/elf.o $(BIN_DIR)/utils.o
+	$(CC) $(CFLAGS) -o $@ $^
 
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.c | $(BIN_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
-
-elfReader.o: $(SRC_DIR)/elfReader.c $(INCLUDE_DIR)/utils.h $(INCLUDE_DIR)/elf.h
-linker.o: $(SRC_DIR)/elfReader.c $(INCLUDE_DIR)/utils.h $(INCLUDE_DIR)/elf.h
 
 distclean:
 	rm -rf $(BIN_DIR) $(TARGET) $(DISTRIBUTION) test_elfReader_results.log
