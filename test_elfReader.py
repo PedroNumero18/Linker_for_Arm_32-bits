@@ -15,7 +15,7 @@ from datetime import datetime
 PROJECT_ROOT = Path(__file__).parent
 ELFreader_PATH = PROJECT_ROOT / "elfReader"
 TESTS_DIR = PROJECT_ROOT / "tests" / "testsSup"
-LOG_FILE = PROJECT_ROOT / "test_results.log"
+LOG_FILE = PROJECT_ROOT / "test_elfReader_results.log"
 
 # Fichiers de test ELF (32-bit big-endian)
 TEST_FILES = [

@@ -6,19 +6,20 @@ CC=clang
 CFLAGS=-Wall -Werror -Wextra -I$(INCLUDE_DIR) -g 
 
 TARGET=elfReader 
+TEST=test_elfReader.py
 DISTRIBUTION=Rendus_PROG5_2025-2026_groupe4.tar.gz
 
 SRC=$(wildcard $(SRC_DIR)/*.c)
 OBJS=$(patsubst $(SRC_DIR)/%.c, $(BIN_DIR)/%.o, $(SRC))
 
-.PHONY: All clean dist
+.PHONY: all clean dist distclean test
 
-All: $(TARGET)
+all: $(TARGET)
 
-test:$(TARGET)
+test: all
+	./$(TEST)
 
-
-dist: clean
+dist: distclean
 	tar czvf $(DISTRIBUTION) *
 
 $(BIN_DIR):
@@ -32,5 +33,8 @@ $(BIN_DIR)/%.o: $(SRC_DIR)/%.c | $(BIN_DIR)
 
 elfReader.o: $(SRC_DIR)/elfReader.c $(INCLUDE_DIR)/utils.h $(INCLUDE_DIR)/elf.h
 
+distclean:
+	rm -rf $(BIN_DIR) $(TARGET) $(DISTRIBUTION) test_elfReader_results.log
+
 clean: 
-	rm -rf $(BIN_DIR) $(TARGET) $(DISTRIBUTION)
+	rm -rf $(TARGET) test_elfReader_results.log
