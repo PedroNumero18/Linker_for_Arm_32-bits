@@ -19,7 +19,7 @@ all:
 
 release: $(TARGET)
 
-debug: CFLAGS+= -g $(TARGET)
+debug: CFLAGS+=-g $(TARGET)
 
 test: release
 	./$(TEST)

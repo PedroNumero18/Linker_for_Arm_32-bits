@@ -200,3 +200,32 @@ void afficher_contenu_section(elf32_t *elf, char *param) {
     }
     printf("\n");
 }
+
+elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2){
+    elf32_fusion_sections* fusion = malloc(sizeof(elf32_fusion_sections));
+    if(!fusion) error("fusion malloc error");
+    fusion->nb_sections = (int)((elf1->header).e_shnum + (elf2->header).e_shnum);
+    int nbre_potalas= 0;
+    fusion->sections = malloc(sizeof(elf32_sections)*fusion->nb_sections);
+    for(int i=0;i<(elf1->header).e_shnum;i++){
+        (fusion->sections)[i]=(elf1->sections)[i];
+    }
+    for(int i=0;i<(elf1->header).e_shnum;i++){
+        for(int j=0;j<(elf2->header).e_shnum;j++){
+            if(((elf1->sections)[i].h_section.sh_type == SHT_PROGBITS && (elf2->sections)[j].h_section.sh_type == SHT_PROGBITS) 
+            && (elf1->sections)[i].h_section.sh_name == (elf2->sections)[j].h_section.sh_name){
+                /*on modifie la taille du contenu de notre fichier fusion*/
+                (fusion->sections)[i].h_section.sh_size+=(elf2->sections)[j].h_section.sh_size;
+                (fusion->sections)[i].contenu = realloc((fusion->sections)[i].contenu, sizeof(uint8_t) * 
+                (elf2->sections)[j].h_section.sh_size + (elf1->sections)[i].h_section.sh_size);
+                strcat((char *)(fusion->sections)[i].contenu,(char *)(elf2->sections)[j].contenu);
+                nbre_potalas++;
+                }
+        }
+    }
+    fusion->nb_sections -= nbre_potalas;
+    for(int i=(elf1->header).e_shnum;i<fusion->nb_sections;i++){
+        (fusion->sections)[i]=(elf2->sections)[fusion->nb_sections - i];
+    }
+    return fusion;
+}

@@ -190,16 +190,15 @@ typedef struct {
 
 
 /*etape6 fusion des sections*/
-//typedef struct {
-//    elf32_sections* sections;   
-//    int  nb_sections;
-//    int* section_map_elf2;
-//    int* section_offset_elf2;   
-//} elf32_fusion_sections;
+typedef struct {
+   elf32_sections* sections;   
+   int  nb_sections;
+   int* section_map_elf2;
+   int* section_offset_elf2;
+ } elf32_fusion_sections;
 
-//elf32_fusion_sections fusion_sections(elf32_t* elf1, elf32_t* elf2);
 
-//void free_fusion_sections(elf32_fusion_sections* fusion);
+
 
 
 /*Structure represantant le contenu du fichier ELF*/
@@ -229,6 +228,10 @@ void afficher_sections(const elf32_t* elf);
 void lire_contenu_sect( FILE* f, elf32_t *elf, int index);
 int get_section_ind_par_nom(const elf32_t *elf, const char *name);
 void afficher_contenu_section( elf32_t *elf, char *param);
+
+//FUSION SECTION
+elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2);
+void free_fusion_sections(elf32_fusion_sections* fusion);
 
 //Table des symboles
 void lire_symbole(FILE* file, elf32_t* elf);
