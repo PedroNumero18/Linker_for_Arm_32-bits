@@ -42,28 +42,29 @@ int main(int argc,char *argv[]){
     if(!elf)error("Error allocating memory to pointer\n");
     
     lire_header(inputFile, elf);
+    
     if(h_flag || a_flag){
         affichage_entete(&elf->header);
     }
 
     lire_sections(inputFile, elf);
+    lire_contenu_sect(inputFile, elf, 6);
+    
     if(S_flag || a_flag){
         afficher_sections(elf);
-        lire_contenu_sect(inputFile, elf, 6); // faudra mettre l'indice de la section qu'on veut afficher
+         // faudra mettre l'indice de la section qu'on veut afficher
         afficher_contenu_section(elf, "6"); // faudra mettre l'indice de la section qu'on veut afficher et pas juste 5
     }
+
+    lire_symbole(inputFile, elf);
     if(s_flag || a_flag){
-        lire_header(inputFile, elf);
-        lire_sections(inputFile, elf);
-        lire_symbole(inputFile, elf);
         afficher_symboles(elf);
     }
+
+    lire_Reimple(inputFile, elf);
     
     if(r_flag || a_flag){
-        lire_header(inputFile, elf);
-        lire_sections(inputFile, elf);
-        lire_symbole(inputFile, elf);
-        lire_Reimple(inputFile, elf);
+        
         afficher_Reimple(elf);
     }
 

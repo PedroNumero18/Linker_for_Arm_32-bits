@@ -3,7 +3,7 @@ BIN_DIR=bin
 INCLUDE_DIR=include
 
 CC=clang
-CFLAGS=-Wall -Werror -Wextra -I$(INCLUDE_DIR) -g 
+CFLAGS=-Wall -Werror -Wextra -I$(INCLUDE_DIR) 
 
 TARGET=elfReader 
 TEST=test_elfReader.py
@@ -12,11 +12,16 @@ DISTRIBUTION=Rendus_PROG5_2025-2026_groupe4.tar.gz
 SRC=$(wildcard $(SRC_DIR)/*.c)
 OBJS=$(patsubst $(SRC_DIR)/%.c, $(BIN_DIR)/%.o, $(SRC))
 
-.PHONY: all clean dist distclean test
+.PHONY: all clean dist distclean test release debug
 
-all: $(TARGET)
+all: 
+	@echo "Tapez 'make debug' pour pouvoir utiliser gdb ou valgrind, 'make release' ou 'make test' pour lancer le jeu de test"
 
-test: all
+release: $(TARGET)
+
+debug: CFLAGS+= -g $(TARGET)
+
+test: release
 	./$(TEST)
 
 dist: distclean

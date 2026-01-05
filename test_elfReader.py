@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 """
 Script de validation du elfReader en le comparant avec arm-none-eabi-readelf
 Teste les fichiers ELF 32-bit big-endian dans le dossier tests/
