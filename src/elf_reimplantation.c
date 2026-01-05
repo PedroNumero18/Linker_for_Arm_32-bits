@@ -80,8 +80,9 @@ void afficher_Reimple(elf32_t* elf){
         printf("\nTable REL:\n");
         for (uint32_t i = 0; i < elf->nb_rel; i++){
             Elf32_Rel r = elf->rel_table[i];
-            printf("Offset: %08x  Type: %s  Sym: %u\n",
+            printf("Offset: %08x Info: %08x Type: %s  Sym: %u\n",
                 r.r_offset,
+                r.r_info,
                 get_rel_type(r.r_info),
                 get_rel_sym(r.r_info));
         }
@@ -94,8 +95,9 @@ void afficher_Reimple(elf32_t* elf){
         printf("\nTable RELA:\n");
         for (uint32_t i = 0; i < elf->nb_RELA; i++){
             Elf32_Rela r = elf->RELA_table[i];
-            printf("Offset: %08x  Type: %s  Sym: %u  Addend: %d\n",
+            printf("Offset: %08x  Info: %08x  Type: %s  Sym: %u  Addend: %d\n",
                 r.r_offset,
+                r.r_info,
                 get_rel_type(r.r_info),
                 get_rel_sym(r.r_info),
                 r.r_addend);
