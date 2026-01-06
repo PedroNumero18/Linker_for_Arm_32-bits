@@ -154,123 +154,123 @@ elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2){
     fusion->nb_sym       = 0;              
     fusion->strtab_size  = 0;  
 
-/*Section elf1 symbole locall*/
-for (int i = 0; i < (int)elf1->nb_symboles; i++) {
-    if (ELF32_ST_BIND( elf1->table_symbole[i].st_info) == STB_LOCAL){
-        fusion->table_symbole[i] = elf1->table_symbole[i];
-        fusion->sym_map_elf1[i] = i;
-        fusion->nb_sym++;
-        //On ajoute notre symbole dans la strtab resultat
-        char *nom_symbole = &elf1->section_str_table[(elf1->table_symbole[i]).st_name];
-        int longueur = strlen(nom_symbole) + 1;
-        memcpy(fusion->strtab + fusion->strtab_size, nom_symbole, longueur);
-        fusion->strtab_size += longueur;
-    }
-}
-/*section 2 symbole locall*/
-for (int i = 0; i < (int)elf2->nb_symboles; i++) {
-    if (ELF32_ST_BIND(elf2->table_symbole[i].st_info) == STB_LOCAL){
-        fusion->table_symbole[fusion->nb_sym] =  elf2->table_symbole[i];
-        fusion->sym_map_elf2[i] = fusion->nb_sym;
-        fusion->nb_sym++;
-        (elf2->table_symbole[i]).st_name += taille_strtab_elf1 ;
-        char *nom_symbole = &elf2->section_str_table[(elf2->table_symbole[i]).st_name];
-        int longueur = strlen(nom_symbole) + 1;
-        memcpy(fusion->strtab + fusion->strtab_size, nom_symbole, longueur);
-        fusion->strtab_size += longueur;
-    }
-}
-
-/*La fusion des Globaux*/
-Symboles_globaux* globaux = NULL;
-int nb_globaux = 0;
-for (int i = 0; i < (int)elf1->nb_symboles; i++) {
-    if (ELF32_ST_BIND(elf1->table_symbole[i].st_info) == STB_GLOBAL) {
-        char *nom_symbole = &elf1->section_str_table[(elf1->table_symbole[i]).st_name];
-        int longueur = strlen(nom_symbole) + 1;
-        memcpy(fusion->strtab + fusion->strtab_size, nom_symbole, longueur);
-        fusion->strtab_size += longueur;
-        globaux = realloc(globaux, (nb_globaux+1)*sizeof(Symboles_globaux));
-        globaux[nb_globaux].nom = &fusion->strtab[fusion->strtab_size];
-        globaux[nb_globaux].sym1 = &elf1->table_symbole[i];
-        globaux[nb_globaux].sym2 = NULL;
-        nb_globaux++;
-    }    
-}
-
-//ajout/completion des symboles de elf2
-for (int i = 0; i < (int)elf2->nb_symboles; i++) {
-    if (ELF32_ST_BIND(elf2->table_symbole[i].st_info) == STB_GLOBAL) {
-        char *nom_symbole = &elf2->section_str_table[(elf2->table_symbole[i]).st_name];
-
-        // Chercher si déjà dans elf1
-        int est_present = 0;
-        int j = 0;
-        while(j < nb_globaux && est_present==0){
-            if (strcmp(nom_symbole, globaux[j].nom) == 0) {
-            globaux[j].sym2 = &elf2->table_symbole[i];
-            est_present = 1;
-            }
-            j++;
+    /*Section elf1 symbole locall*/
+    for (int i = 0; i < (int)elf1->nb_symboles; i++) {
+        if (ELF32_ST_BIND( elf1->table_symbole[i].st_info) == STB_LOCAL){
+            fusion->table_symbole[i] = elf1->table_symbole[i];
+            fusion->sym_map_elf1[i] = i;
+            fusion->nb_sym++;
+            //On ajoute notre symbole dans la strtab resultat
+            char *nom_symbole = &elf1->section_str_table[(elf1->table_symbole[i]).st_name];
+            int longueur = strlen(nom_symbole) + 1;
+            memcpy(fusion->strtab + fusion->strtab_size, nom_symbole, longueur);
+            fusion->strtab_size += longueur;
         }
-
-        //cas ou il est absent
-        if(!est_present){
+    }
+    /*section 2 symbole locall*/
+    for (int i = 0; i < (int)elf2->nb_symboles; i++) {
+        if (ELF32_ST_BIND(elf2->table_symbole[i].st_info) == STB_LOCAL){
+            fusion->table_symbole[fusion->nb_sym] =  elf2->table_symbole[i];
+            fusion->sym_map_elf2[i] = fusion->nb_sym;
+            fusion->nb_sym++;
+            (elf2->table_symbole[i]).st_name += taille_strtab_elf1 ;
             char *nom_symbole = &elf2->section_str_table[(elf2->table_symbole[i]).st_name];
+            int longueur = strlen(nom_symbole) + 1;
+            memcpy(fusion->strtab + fusion->strtab_size, nom_symbole, longueur);
+            fusion->strtab_size += longueur;
+        }
+    }
+
+    /*La fusion des Globaux*/
+    Symboles_globaux* globaux = NULL;
+    int nb_globaux = 0;
+    for (int i = 0; i < (int)elf1->nb_symboles; i++) {
+        if (ELF32_ST_BIND(elf1->table_symbole[i].st_info) == STB_GLOBAL) {
+            char *nom_symbole = &elf1->section_str_table[(elf1->table_symbole[i]).st_name];
             int longueur = strlen(nom_symbole) + 1;
             memcpy(fusion->strtab + fusion->strtab_size, nom_symbole, longueur);
             fusion->strtab_size += longueur;
             globaux = realloc(globaux, (nb_globaux+1)*sizeof(Symboles_globaux));
             globaux[nb_globaux].nom = &fusion->strtab[fusion->strtab_size];
-            globaux[nb_globaux].sym2 = &elf2->table_symbole[i];
-            globaux[nb_globaux].sym1 = NULL;
+            globaux[nb_globaux].sym1 = &elf1->table_symbole[i];
+            globaux[nb_globaux].sym2 = NULL;
             nb_globaux++;
+        }    
+    }
+
+    //ajout/completion des symboles de elf2
+    for (int i = 0; i < (int)elf2->nb_symboles; i++) {
+        if (ELF32_ST_BIND(elf2->table_symbole[i].st_info) == STB_GLOBAL) {
+            char *nom_symbole = &elf2->section_str_table[(elf2->table_symbole[i]).st_name];
+
+            // Chercher si déjà dans elf1
+            int est_present = 0;
+            int j = 0;
+            while(j < nb_globaux && est_present==0){
+                if (strcmp(nom_symbole, globaux[j].nom) == 0) {
+                globaux[j].sym2 = &elf2->table_symbole[i];
+                est_present = 1;
+                }
+                j++;
+            }
+
+            //cas ou il est absent
+            if(!est_present){
+                char *nom_symbole = &elf2->section_str_table[(elf2->table_symbole[i]).st_name];
+                int longueur = strlen(nom_symbole) + 1;
+                memcpy(fusion->strtab + fusion->strtab_size, nom_symbole, longueur);
+                fusion->strtab_size += longueur;
+                globaux = realloc(globaux, (nb_globaux+1)*sizeof(Symboles_globaux));
+                globaux[nb_globaux].nom = &fusion->strtab[fusion->strtab_size];
+                globaux[nb_globaux].sym2 = &elf2->table_symbole[i];
+                globaux[nb_globaux].sym1 = NULL;
+                nb_globaux++;
+            }
         }
     }
-}
 
-//on fait le tri dans notre fusion
-for (int i = 0; i < nb_globaux; i++) {
-    Elf32_Sym* symbole_elf1 = globaux[i].sym1;
-    Elf32_Sym* symbole_elf2 = globaux[i].sym2;    
-    Elf32_Sym* a_copier = NULL;
-    
-    // RÈGLE 1 : 2 définis → ERREUR
-    if ((symbole_elf1 && symbole_elf1->st_shndx != STN_UNDEF) && 
-    (symbole_elf2 && symbole_elf2->st_shndx != STN_UNDEF)) {
-        printf("%s", globaux[i].nom);
-        error("symbole défini dans les 2 fichiers\n");
+    //on fait le tri dans notre fusion
+    for (int i = 0; i < nb_globaux; i++) {
+        Elf32_Sym* symbole_elf1 = globaux[i].sym1;
+        Elf32_Sym* symbole_elf2 = globaux[i].sym2;    
+        Elf32_Sym* a_copier = NULL;
+        
+        // RÈGLE 1 : 2 définis → ERREUR
+        if ((symbole_elf1 && symbole_elf1->st_shndx != STN_UNDEF) && 
+        (symbole_elf2 && symbole_elf2->st_shndx != STN_UNDEF)) {
+            printf("%s", globaux[i].nom);
+            error("symbole défini dans les 2 fichiers\n");
+        }
+        // RÈGLE 2 : 1 défini → le prendre
+        else if ((symbole_elf1 && symbole_elf1->st_shndx != STN_UNDEF)) {
+            a_copier = symbole_elf1;
+        }
+        else if ((symbole_elf2 && symbole_elf2->st_shndx != STN_UNDEF)) {
+            a_copier = symbole_elf2;
+        }
+        // RÈGLE 3 : 2 indéfinis → 1 seul
+        else if (!(symbole_elf2 && symbole_elf2->st_shndx != STN_UNDEF) && 
+            !(symbole_elf1 && symbole_elf1->st_shndx != STN_UNDEF) && 
+            symbole_elf1 && 
+            symbole_elf2) {
+            a_copier = symbole_elf1;  // arbitraire : prendre elf1
+        }
+        // RÈGLE 4 : 1 seul → le prendre
+        else if (symbole_elf1) {
+            a_copier = symbole_elf1;
+        }
+        else if (symbole_elf2) {
+            a_copier = symbole_elf2;
+        }
+        
+        // Copier avec st_name correct
+        if (a_copier) {
+            fusion->table_symbole[fusion->nb_sym] =  *a_copier;;
+            globaux[i].index_fusion = fusion->nb_sym;
+            fusion->nb_sym++;
+        }
     }
-    // RÈGLE 2 : 1 défini → le prendre
-    else if ((symbole_elf1 && symbole_elf1->st_shndx != STN_UNDEF)) {
-        a_copier = symbole_elf1;
-    }
-    else if ((symbole_elf2 && symbole_elf2->st_shndx != STN_UNDEF)) {
-        a_copier = symbole_elf2;
-    }
-    // RÈGLE 3 : 2 indéfinis → 1 seul
-    else if (!(symbole_elf2 && symbole_elf2->st_shndx != STN_UNDEF) && 
-        !(symbole_elf1 && symbole_elf1->st_shndx != STN_UNDEF) && 
-        symbole_elf1 && 
-        symbole_elf2) {
-        a_copier = symbole_elf1;  // arbitraire : prendre elf1
-    }
-    // RÈGLE 4 : 1 seul → le prendre
-    else if (symbole_elf1) {
-        a_copier = symbole_elf1;
-    }
-    else if (symbole_elf2) {
-        a_copier = symbole_elf2;
-    }
-    
-    // Copier avec st_name correct
-    if (a_copier) {
-        fusion->table_symbole[fusion->nb_sym] =  *a_copier;;
-        globaux[i].index_fusion = fusion->nb_sym;
-        fusion->nb_sym++;
-    }
-}
-free(globaux);
-return fusion;
+    free(globaux);
+    return fusion;
 }
  

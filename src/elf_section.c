@@ -160,7 +160,7 @@ int get_section_ind_par_nom(const elf32_t *elf, const char *name) {
 }
 
 
-void afficher_contenu_section(elf32_t *elf, char *param) {
+void afficher_contenu_section(elf32_t *elf, char *param){
     int index_section = -1;
 
     //Trouver l'index de la section 

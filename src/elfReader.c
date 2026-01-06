@@ -7,7 +7,7 @@
 
 void print_flags(const char* nom){
     fprintf(stderr,"Usage:\n" 
-           "%s <option(s)> <filename>\n"
+           "./%s <option(s)> <filename>\n"
            "affiche toutes les informations d'un fichier au format ELF\n"
            "voici les options:\n"
            " -a \t\t\t montre l'intégralité du fichier\n"

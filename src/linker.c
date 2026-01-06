@@ -7,18 +7,49 @@
 
 void print_flags(const char* nom){
     fprintf(stderr,"Usage:\n" 
-           "%s <option(s)> <filename>\n"
-           "affiche toutes les informations d'un fichier au format ELF\n"
+           "./%s <option> <result> <filename1> <filename2>\n"
+           "DEFAULT result: a.out\n"
+           "fusionne 1 à 2 fichier au format elf pour en faire un executable\n"
            "voici les options:\n"
-           " -a \t\t\t montre l'intégralité du fichier\n"
-           " -h \t\t\t montre les headers du fichier\n"
-           " -S \t\t\t montre les section du fichier\n"
-           " -s \t\t\t montre la table des symboles du fichier\n"
+           " -h \t\t\t montre comment utilisée ce programme\n"
+           " -o \t\t\t permet de choisir le nom du fichier final\n"
     , nom);
     return;
 }
 
 int main(int argc, char** argv){
-    printf("%s",argv[0]);
-    return argc;
+    int opt;
+    char* filename1 = NULL, filename2 = NULL, result = "a.out";
+    FILE *file1, *file2, *output;
+
+
+    while(  (   opt = getopt(argc, argv, "ho:")   ) != -1){
+        switch (opt){
+            case 'h': print_flags(argv[0]); return 0;                               break;
+            case 'o': result = optarg;                                              break; 
+            default: print_flags(argv[0]); error("cette option n'existe pas !!!");  break;
+        }
+    }
+    if ((argc - optind) != 2){
+        print_flags(argv[0]); error("Erreur:attendu 2 fichiers en entrée \n");
+    }
+    filename1 = argv[optind];
+    filename2 = argv[optind + 1];
+
+    file1 = fopen(filename1, "rb");
+    file2 = fopen(filename2, "rb");
+
+    if (!file1 || !file2) error("Error opening files\n");
+
+    elf32_t* elf1 = elf_init();
+    elf32_t* elf2 = elf_init();
+
+    lire_header(file1, elf1);   lire_header(file2, elf2);
+    lire_sections(file1, elf1); lire_sections(file2, elf2);
+    lire_symbole(file1, elf1);  lire_symbole(file2, elf2);
+    lire_Reimple(file1, elf1);  lire_Reimple(file2, elf2);
+    elf32_fusion_sections* fusionSec = fusion_sections(elf1, elf2);
+    elf32_fusion_symboles* fusionSym = fusion_symboles(elf1, elf2);
+
+    return 0;
 }
