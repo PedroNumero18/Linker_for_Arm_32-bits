@@ -53,7 +53,7 @@ int main(int argc,char *argv[]){
     if(S_flag || a_flag){
         afficher_sections(elf);
          // faudra mettre l'indice de la section qu'on veut afficher
-        afficher_contenu_section(elf, "6"); // faudra mettre l'indice de la section qu'on veut afficher et pas juste 5
+        afficher_contenu_section(elf, "1"); // faudra mettre l'indice de la section qu'on veut afficher et pas juste 5
     }
 
     lire_symbole(inputFile, elf);

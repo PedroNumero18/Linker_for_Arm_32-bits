@@ -77,14 +77,17 @@ void afficher_Reimple(elf32_t* elf){
 
     //rel
     if (elf->rel_table && elf->nb_rel > 0){
-        printf("\nTable REL:\n");
+        printf("\nRelocation section '.rel' contains %u entries:\n", elf->nb_rel);
+        printf(" Offset     Info    Type            Sym.Value  Sym.Name\n");
         for (uint32_t i = 0; i < elf->nb_rel; i++){
             Elf32_Rel r = elf->rel_table[i];
-            printf("Offset: %08x Info: %08x Type: %s  Sym: %u\n",
-                r.r_offset,
-                r.r_info,
-                get_rel_type(r.r_info),
-                get_rel_sym(r.r_info));
+            printf("%08x  %08x %-15s %08x   %s\n",
+                r.r_offset,              
+                r.r_info,                
+                get_rel_type(r.r_info),  
+                get_rel_sym(r.r_info),                       
+                "?"//sym.Name                  
+            );
         }
     } else {
         printf("Aucune table REL présente.\n");
@@ -92,15 +95,18 @@ void afficher_Reimple(elf32_t* elf){
 
     //rela
     if (elf->RELA_table && elf->nb_RELA > 0){
-        printf("\nTable RELA:\n");
+        printf("\nRelocation section '.rela' contains %u entries:\n", elf->nb_RELA);
+        printf(" Offset     Info    Type            Sym.Value  Sym.Name + Addend\n");
         for (uint32_t i = 0; i < elf->nb_RELA; i++){
             Elf32_Rela r = elf->RELA_table[i];
-            printf("Offset: %08x  Info: %08x  Type: %s  Sym: %u  Addend: %d\n",
-                r.r_offset,
-                r.r_info,
-                get_rel_type(r.r_info),
-                get_rel_sym(r.r_info),
-                r.r_addend);
+            printf("%08x  %08x %-15s %08x   %s + %d\n",
+                r.r_offset,              
+                r.r_info,                
+                get_rel_type(r.r_info),  
+                get_rel_sym(r.r_info),                       
+                "?",//Sym.Name                     
+                r.r_addend
+            );
         }
     } else {
         printf("Aucune table RELA présente.\n");

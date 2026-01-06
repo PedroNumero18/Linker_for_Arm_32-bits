@@ -163,11 +163,11 @@ int get_section_ind_par_nom(const elf32_t *elf, const char *name) {
 void afficher_contenu_section(elf32_t *elf, char *param) {
     int index_section = -1;
 
-    // Trouver l'index de la section 
+    //Trouver l'index de la section 
     if (is_numerical(param)) index_section = atoi(param);
     else {
         for (int i = 0; i < elf->header.e_shnum; i++) {
-            // Calcul du nom : table des strings + offset du nom de la section
+            //Calcul du nom : table des strings + offset du nom de la section
             char *nom_courant = elf->section_str_table + elf->sections[i].h_section.sh_name;
             if (strcmp(nom_courant, param) == 0) {
                 index_section = i;
@@ -190,17 +190,122 @@ void afficher_contenu_section(elf32_t *elf, char *param) {
         return;
     }
     printf("Contenu de la section '%s' (Index %d) :\n", param, index_section);
+    
+    for (Elf32_Word i = 0; i < sect->h_section.sh_size; i += 16) {
 
-    for (Elf32_Word i = 0; i < sect->h_section.sh_size; i++) {
-        // On passe à la ligne tous les 16 octets et on affiche l'adresse
-        if (i % 16 == 0) {printf("\n  0x%08x ", i);}
-        printf("%02x", sect->contenu[i]); // Affiche l'octet en hex
-        // Espace tous les 4 octets
-        if ((i + 1) % 4 == 0) printf(" "); 
+        /* Adresse */
+        printf("  0x%08x ", i);
+
+        /* Partie HEX */
+        for (int j = 0; j < 16; j++) {
+            if (i + j < sect->h_section.sh_size)
+                printf("%02x", sect->contenu[i + j]);
+            else
+                printf("  ");
+
+            if ((j + 1) % 4 == 0) printf(" ");
+        }
+
+        /* Partie ASCII */
+        printf(" ");
+
+        for (int j = 0; j < 16 && i + j < sect->h_section.sh_size; j++) {
+            unsigned char c = sect->contenu[i + j];
+            if (isprint(c))
+                printf("%c", c);
+            else
+                printf(".");
+        }
+
+        printf("\n");
     }
-    printf("\n");
 }
 
+
+elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2) {
+    elf32_fusion_sections* fusion = malloc(sizeof(elf32_fusion_sections));
+    if (!fusion) error("Erreur malloc fusion");
+    int max_sections = elf1->header.e_shnum + elf2->header.e_shnum;
+    fusion->sections = malloc(sizeof(elf32_sections) * max_sections);
+    if (!fusion->sections) error("Erreur malloc sections fusion");
+    int idx_fusion = 0;
+    //section elf1
+    for (int i = 0; i < elf1->header.e_shnum; i++) {
+        fusion->sections[idx_fusion].h_section =
+            elf1->sections[i].h_section;
+
+        if (elf1->sections[i].h_section.sh_size > 0 &&
+            elf1->sections[i].contenu != NULL) {
+
+            fusion->sections[idx_fusion].contenu =malloc(elf1->sections[i].h_section.sh_size);
+            memcpy(
+                fusion->sections[idx_fusion].contenu,
+                elf1->sections[i].contenu,
+                elf1->sections[i].h_section.sh_size
+            );
+        } else {
+            fusion->sections[idx_fusion].contenu = NULL;
+        }
+        idx_fusion++;
+    }
+    //section elf2
+    for (int j = 0; j < elf2->header.e_shnum; j++) {
+        int fusionnee = 0;
+        const char *name2 = elf2->section_str_table + elf2->sections[j].h_section.sh_name;
+
+        for (int i = 0; i < elf1->header.e_shnum; i++) {
+            const char *name1 = elf1->section_str_table + elf1->sections[i].h_section.sh_name;
+            if (strcmp(name1, name2) == 0 &&
+                elf1->sections[i].h_section.sh_type == SHT_PROGBITS &&
+                elf2->sections[j].h_section.sh_type == SHT_PROGBITS) {
+                size_t old_size = fusion->sections[i].h_section.sh_size;
+                size_t add_size = elf2->sections[j].h_section.sh_size;
+
+                fusion->sections[i].contenu = realloc(
+                    fusion->sections[i].contenu,
+                    old_size + add_size
+                );
+                memcpy(
+                    fusion->sections[i].contenu + old_size,
+                    elf2->sections[j].contenu,
+                    add_size
+                );
+                fusion->sections[i].h_section.sh_size = old_size + add_size;
+                fusionnee = 1;
+                break;
+            }
+        }
+
+
+        //ajout
+
+        if (!fusionnee) {
+            fusion->sections[idx_fusion].h_section =
+                elf2->sections[j].h_section;
+
+            if (elf2->sections[j].h_section.sh_size > 0 &&
+                elf2->sections[j].contenu != NULL) {
+
+                fusion->sections[idx_fusion].contenu =
+                    malloc(elf2->sections[j].h_section.sh_size);
+
+                memcpy(
+                    fusion->sections[idx_fusion].contenu,
+                    elf2->sections[j].contenu,
+                    elf2->sections[j].h_section.sh_size
+                );
+            } else {
+                fusion->sections[idx_fusion].contenu = NULL;
+            }
+
+            idx_fusion++;
+        }
+    }
+
+    fusion->nb_sections = idx_fusion;
+    return fusion;
+}
+/*
 elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2){
     elf32_fusion_sections* fusion = malloc(sizeof(elf32_fusion_sections));
     if(!fusion) error("fusion malloc error");
@@ -214,7 +319,7 @@ elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2){
         for(int j=0;j<(elf2->header).e_shnum;j++){
             if(((elf1->sections)[i].h_section.sh_type == SHT_PROGBITS && (elf2->sections)[j].h_section.sh_type == SHT_PROGBITS) 
             && (elf1->sections)[i].h_section.sh_name == (elf2->sections)[j].h_section.sh_name){
-                /*on modifie la taille du contenu de notre fichier fusion*/
+                //on modifie la taille du contenu de notre fichier fusion
                 (fusion->sections)[i].h_section.sh_size+=(elf2->sections)[j].h_section.sh_size;
                 (fusion->sections)[i].contenu = realloc((fusion->sections)[i].contenu, sizeof(uint8_t) * 
                 (elf2->sections)[j].h_section.sh_size + (elf1->sections)[i].h_section.sh_size);
@@ -229,3 +334,4 @@ elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2){
     }
     return fusion;
 }
+*/
