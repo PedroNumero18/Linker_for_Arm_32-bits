@@ -14,6 +14,7 @@ void print_flags(const char* nom){
            " -h \t\t\t montre les headers du fichier\n"
            " -S \t\t\t montre les section du fichier\n"
            " -s \t\t\t montre la table des symboles du fichier\n"
+           " -r \t\t\t montre les tables de réimplantation\n"
     , nom);
     return;
 }
@@ -42,31 +43,16 @@ int main(int argc,char *argv[]){
     if(!elf)error("Error allocating memory to pointer\n");
     
     lire_header(inputFile, elf);
-    
-    if(h_flag || a_flag){
-        affichage_entete(&elf->header);
-    }
-
     lire_sections(inputFile, elf);
     lire_contenu_sect(inputFile, elf, 6);
-    
-    if(S_flag || a_flag){
-        afficher_sections(elf);
-         // faudra mettre l'indice de la section qu'on veut afficher
-        afficher_contenu_section(elf, "1"); // faudra mettre l'indice de la section qu'on veut afficher et pas juste 5
-    }
-
     lire_symbole(inputFile, elf);
-    if(s_flag || a_flag){
-        afficher_symboles(elf);
-    }
-
     lire_Reimple(inputFile, elf);
+
+    if(h_flag || a_flag){affichage_entete(&elf->header);}
+    if(S_flag || a_flag){afficher_sections(elf); afficher_contenu_section(elf, "1");}
+    if(s_flag || a_flag) afficher_symboles(elf);
+    if(r_flag || a_flag) afficher_Reimple(elf);
     
-    if(r_flag || a_flag){
-        
-        afficher_Reimple(elf);
-    }
 
     elf_free(elf);
     return 0;

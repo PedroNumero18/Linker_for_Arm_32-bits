@@ -1,7 +1,9 @@
+.vscode/
 bin/
 *.o
 *.out
 linker
 elfReader
 *.log
+
 

@@ -7,9 +7,37 @@
 const char* get_rel_type(uint32_t r_info){
     unsigned char type = ELF32_R_TYPE(r_info);
     switch(type){
-        case 0: return "NONE";
-        case 2 ... 11: return "STATIC";
-        default: return "UNKNOWN";
+        case 0:         return "R_ARM_NONE";
+        case 2:         return "R_ARM_ABS32";
+        case 3:         return "R_ARM_REL32";
+        case 4:         return "R_ARM_LDR_PC_G0";
+        case 5 ... 8:   return "R_ARM_ABS";
+        case 9:         return "R_ARM_SBREL32";
+        case 10:        return "R_ARM_THM_CALL";
+        case 11:        return "R_ARM_THM_PC8";
+        case 24:        return "R_ARM_GOTOFF32";
+        case 25:        return "R_ARM_BASE_PREL";
+        case 26:        return "R_ARM_GOT_BREL";
+        case 28:        return "R_ARM_CALL";
+        
+        case 29:            
+        case 30:        return "R_ARM_JUMP24";        
+        
+        case 31:        return "R_ARM_BASE_ABS";
+        case 38:        return "R_ARM_TARGET1";
+        case 40:        return "R_ARM_V4BX";
+        case 41:        return "R_ARM_TARGET2";
+        case 42:        return "R_ARM_PREL31";
+
+        case 47:
+        case 43:        return "R_ARM_MOVW_ABS_NC";
+        case 48:
+        case 44:        return "R_ARM_MOVT_ABS";
+        case 49:
+        case 45:        return "R_ARM_MOVW_PREL_NC";
+        case 50:
+        case 46:        return "R_ARM_MOVT_PREL";
+        default:        return "UNKNOWN";
     }
 }
 

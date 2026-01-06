@@ -11,6 +11,7 @@ DISTRIBUTION=Rendus_PROG5_2025-2026_groupe4.tar.gz
 
 SRC=$(wildcard $(SRC_DIR)/*.c)
 OBJS=$(patsubst $(SRC_DIR)/%.c, $(BIN_DIR)/%.o, $(SRC))
+OBJS_COMMON=$(filter-out $(BIN_DIR)/elfReader.o $(BIN_DIR)/linker.o, $(OBJS))
 
 .PHONY: all clean dist distclean test release debug
 
@@ -31,10 +32,10 @@ dist: distclean
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
-elfReader: $(BIN_DIR)/elfReader.o $(BIN_DIR)/elf_header.o $(BIN_DIR)/elf_section.o $(BIN_DIR)/elf_tableSymbole.o $(BIN_DIR)/elf_reimplantation.o $(BIN_DIR)/elf.o $(BIN_DIR)/utils.o
+elfReader: $(BIN_DIR)/elfReader.o $(OBJS_COMMON)
 	$(CC) $(CFLAGS) -o $@ $^
 
-linker: $(BIN_DIR)/linker.o $(BIN_DIR)/elf_header.o $(BIN_DIR)/elf_section.o $(BIN_DIR)/elf_tableSymbole.o $(BIN_DIR)/elf_reimplantation.o $(BIN_DIR)/elf.o $(BIN_DIR)/utils.o
+linker: $(BIN_DIR)/linker.o $(OBJS_COMMON)
 	$(CC) $(CFLAGS) -o $@ $^
 
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.c | $(BIN_DIR)
