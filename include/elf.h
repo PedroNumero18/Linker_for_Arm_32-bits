@@ -176,6 +176,14 @@ typedef struct {
 	Elf32_Half    st_shndx;
 } Elf32_Sym;
 
+//Structure pour gerer les symboles globaux plus facilement
+typedef struct {
+    char* nom;           // pointeur vers fusion->strtab
+    Elf32_Sym* sym1;     // NULL si pas dans elf1
+    Elf32_Sym* sym2;     // NULL si pas dans elf2
+    int index_fusion;   
+} Symboles_globaux;
+
 
 /*Structure pour les reimplementations*/
 typedef struct {
@@ -198,6 +206,16 @@ typedef struct {
    int* section_map_elf2;
    int* section_offset_elf2;
  } elf32_fusion_sections;
+
+/* Table de symboles fusionnée (symtab de sortie) */
+ typedef struct {
+    Elf32_Sym *table_symbole; 
+    int        nb_sym;      
+    char      *strtab;     
+    int        strtab_size;
+    int       *sym_map_elf1; 
+    int       *sym_map_elf2;
+} elf32_fusion_symboles;
 
 
 /*Structure represantant le contenu du fichier ELF*/
@@ -241,6 +259,9 @@ const char* get_type_string(unsigned char info);
 const char* get_bind_string(unsigned char info);
 const char* get_ndx_string(Elf32_Half shndx);
 void afficher_symboles(elf32_t* elf);
+
+//FUSION SYMBOLE
+elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2);
 
 //REIMPLEMENTATION
 void lire_Reimple(FILE* file, elf32_t* elf);
