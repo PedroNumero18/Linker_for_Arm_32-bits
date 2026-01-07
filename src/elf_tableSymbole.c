@@ -91,7 +91,17 @@ void afficher_symboles(elf32_t* elf){
     printf("Num  Value     Size Type    Bind   Ndx Name\n");
     for (uint32_t i = 0; i < elf->nb_symboles; i++){
         Elf32_Sym sym = elf->table_symbole[i];
-
+        const char* nom = NULL;
+        if (ELF32_ST_TYPE(sym.st_info) == STT_SECTION) {
+            if (sym.st_shndx < elf->header.e_shnum && sym.st_shndx != SHN_UNDEF) {
+                Elf32_Shdr sec = elf->sections[sym.st_shndx].h_section;
+                nom = &elf->section_str_table[sec.sh_name];
+            } else {
+                nom = "";
+            }
+        } else {
+            nom = &elf->symbol_str_table[sym.st_name];
+        }
         printf("%3d  %08x %5d %-7s %-6s %3s %s\n",
             i,
             sym.st_value,
@@ -99,7 +109,7 @@ void afficher_symboles(elf32_t* elf){
             get_type_string(sym.st_info),
             get_bind_string(sym.st_info),
             get_ndx_string(sym.st_shndx),
-            &elf->symbol_str_table[sym.st_name]
+            nom
 
         );
     }
