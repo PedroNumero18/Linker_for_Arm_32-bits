@@ -49,9 +49,7 @@ uint32_t get_rel_sym(uint32_t r_info){
 void lire_Reimple(FILE* file, elf32_t* elf){
     if (file == NULL || elf == NULL) error("Erreur : fichier ou structure ELF NULL\n");
 
-    //recherche section rel et rela
     int index_Rela = -1, index_rel = -1;
-
     for (int i = 0; i < elf->header.e_shnum; i++){
         uint32_t type = elf->sections[i].h_section.sh_type;
         if (type == SHT_REL)   index_rel = i;
