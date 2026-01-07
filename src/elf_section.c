@@ -232,6 +232,8 @@ static int est_fusionnable(const Elf32_Shdr *s) {
 
 
 elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2) {
+    if (!elf1 || !elf2) error("ELF non initialisé");
+
     elf32_fusion_sections* fusion = malloc(sizeof(elf32_fusion_sections));
     if (!fusion) error("Erreur malloc fusion");
 
@@ -245,18 +247,15 @@ elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2) {
 
     int idx_fusion = 0;
 
-    /* ================================
-       1) Copier toutes les sections ELF1
-       ================================ */
     for (int i = 0; i < elf1->header.e_shnum; i++) {
         fusion->sections[idx_fusion].h_section = elf1->sections[i].h_section;
 
         if (elf1->sections[i].h_section.sh_size > 0 &&
             elf1->sections[i].contenu != NULL) {
-
             fusion->sections[idx_fusion].contenu =
                 malloc(elf1->sections[i].h_section.sh_size);
-
+            if (!fusion->sections[idx_fusion].contenu)
+                error("Erreur malloc section ELF1");
             memcpy(fusion->sections[idx_fusion].contenu,
                    elf1->sections[i].contenu,
                    elf1->sections[i].h_section.sh_size);
@@ -266,43 +265,31 @@ elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2) {
         idx_fusion++;
     }
 
-    /* ================================
-       2) Parcourir ELF2
-       ================================ */
     for (int j = 0; j < elf2->header.e_shnum; j++) {
         int fusionnee = 0;
-        const char *name2 =
-            elf2->section_str_table + elf2->sections[j].h_section.sh_name;
+        const char *name2 = elf2->section_str_table + elf2->sections[j].h_section.sh_name;
 
-        /* Chercher une section de même nom dans ELF1 */
         for (int i = 0; i < elf1->header.e_shnum; i++) {
-            const char *name1 =
-                elf1->section_str_table + elf1->sections[i].h_section.sh_name;
+            const char *name1 = elf1->section_str_table + elf1->sections[i].h_section.sh_name;
 
             if (strcmp(name1, name2) == 0 &&
                 est_fusionnable(&elf1->sections[i].h_section) &&
                 est_fusionnable(&elf2->sections[j].h_section)) {
 
-                printf(">>> FUSION DE LA SECTION : %s\n", name2);
-
                 size_t old_size = fusion->sections[i].h_section.sh_size;
                 size_t add_size = elf2->sections[j].h_section.sh_size;
 
-                fusion->sections[i].contenu = realloc(
-                    fusion->sections[i].contenu,
-                    old_size + add_size
-                );
+                uint8_t* new_buf = realloc(fusion->sections[i].contenu, old_size + add_size);
+                if (!new_buf) error("Erreur realloc fusion PROGBITS");
 
-                memcpy(fusion->sections[i].contenu + old_size,
-                       elf2->sections[j].contenu,
-                       add_size);
+                memcpy(new_buf + old_size, elf2->sections[j].contenu, add_size);
 
+                fusion->sections[i].contenu = new_buf;
                 fusion->sections[i].h_section.sh_size = old_size + add_size;
 
-                /* mémoriser renumérotation + offset */
                 fusion->map_elf2[fusion->nb_map].ancien_index = j;
                 fusion->map_elf2[fusion->nb_map].nouvel_index = i;
-                fusion->map_elf2[fusion->nb_map].offset    = old_size;
+                fusion->map_elf2[fusion->nb_map].offset = old_size;
                 fusion->nb_map++;
 
                 fusionnee = 1;
@@ -310,36 +297,70 @@ elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2) {
             }
         }
 
-        /* ================================
-           3) Ajouter si non fusionnée
-           ================================ */
-        if (!fusionnee) {
-            fusion->sections[idx_fusion].h_section =
-                elf2->sections[j].h_section;
-
-            if (elf2->sections[j].h_section.sh_size > 0 &&
-                elf2->sections[j].contenu != NULL) {
-
-                fusion->sections[idx_fusion].contenu =
-                    malloc(elf2->sections[j].h_section.sh_size);
-
-                memcpy(fusion->sections[idx_fusion].contenu,
-                       elf2->sections[j].contenu,
-                       elf2->sections[j].h_section.sh_size);
-            } else {
-                fusion->sections[idx_fusion].contenu = NULL;
+        if (fusionnee) continue;
+        if (elf2->sections[j].h_section.sh_type == SHT_STRTAB) {
+            int found = -1;
+            for (int i = 0; i < idx_fusion; i++) {
+                const char* name1 = elf1->section_str_table + elf1->sections[i].h_section.sh_name;
+                if (strcmp(name1, name2) == 0) { found = i; break; }
             }
 
-            /* mémoriser renumérotation sans offset */
-            fusion->map_elf2[fusion->nb_map].ancien_index = j;
-            fusion->map_elf2[fusion->nb_map].nouvel_index = idx_fusion;
-            fusion->map_elf2[fusion->nb_map].offset    = 0;
-            fusion->nb_map++;
+            if (found >= 0) {
+                size_t old_size = fusion->sections[found].h_section.sh_size;
+                size_t add_size = elf2->sections[j].h_section.sh_size;
+                uint8_t* new_buf = malloc(old_size + add_size);
+                if (!new_buf) error("Erreur malloc fusion STRTAB");
 
-            idx_fusion++;
+                memcpy(new_buf, fusion->sections[found].contenu, old_size);
+                memcpy(new_buf + old_size, elf2->sections[j].contenu, add_size);
+
+                free(fusion->sections[found].contenu);
+                fusion->sections[found].contenu = new_buf;
+                fusion->sections[found].h_section.sh_size = old_size + add_size;
+
+                for (int s = 0; s < elf2->header.e_shnum; s++) {
+                    if (elf2->sections[s].h_section.sh_type == SHT_SYMTAB) {
+                        Elf32_Sym* symtab = (Elf32_Sym*)elf2->sections[s].contenu;
+                        int nb_sym = elf2->sections[s].h_section.sh_size / sizeof(Elf32_Sym);
+                        for (int k = 0; k < nb_sym; k++) {
+                            symtab[k].st_name += old_size;
+                        }
+                    }
+                }
+
+                fusion->map_elf2[fusion->nb_map].ancien_index = j;
+                fusion->map_elf2[fusion->nb_map].nouvel_index = found;
+                fusion->map_elf2[fusion->nb_map].offset = old_size;
+                fusion->nb_map++;
+                continue;
+            }
         }
+
+        fusion->sections[idx_fusion].h_section = elf2->sections[j].h_section;
+        if (elf2->sections[j].h_section.sh_size > 0 &&
+            elf2->sections[j].contenu != NULL) {
+            fusion->sections[idx_fusion].contenu =
+                malloc(elf2->sections[j].h_section.sh_size);
+            if (!fusion->sections[idx_fusion].contenu)
+                error("Erreur malloc section ELF2");
+            memcpy(fusion->sections[idx_fusion].contenu,
+                   elf2->sections[j].contenu,
+                   elf2->sections[j].h_section.sh_size);
+        } else {
+            fusion->sections[idx_fusion].contenu = NULL;
+        }
+
+        fusion->map_elf2[fusion->nb_map].ancien_index = j;
+        fusion->map_elf2[fusion->nb_map].nouvel_index = idx_fusion;
+        fusion->map_elf2[fusion->nb_map].offset = 0;
+        fusion->nb_map++;
+
+        idx_fusion++;
     }
 
     fusion->nb_sections = idx_fusion;
+
+    fusion->section_str_table = (char*)fusion->sections[elf1->header.e_shstrndx].contenu;
+
     return fusion;
 }

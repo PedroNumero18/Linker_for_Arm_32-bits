@@ -66,9 +66,8 @@ int main(int argc, char** argv){
     elf_fusion_fake.section_str_table =(char*)fusionSec->sections[fusionSec->nb_sections - 1].contenu;
     afficher_sections(&elf_fusion_fake);
 
-    printf("\n===== CONTENU DE LA SECTION 1 APRÈS FUSION =====\n");
+    printf("\n===== CONTENU DE LA SECTION 6 APRÈS FUSION =====\n");
     afficher_contenu_section(&elf_fusion_fake, "6");
-
     elf32_fusion_symboles* fusionSymb = fusion_symboles(elf1, elf2);
     if (!fusionSymb) error("erreur fusion symbole");
 
@@ -88,7 +87,6 @@ int main(int argc, char** argv){
 
     printf("\n===== SYMBOLES FUSIONNES =====\n");
     afficher_symboles(&elf_fusion);
-
 
     elf_free(elf1);
     elf_free(elf2);
