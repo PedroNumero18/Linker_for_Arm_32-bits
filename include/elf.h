@@ -222,7 +222,8 @@ typedef struct {
 typedef struct { 
   Elf32_Ehdr      header ;
   elf32_sections* sections;
-  char*           section_str_table;	
+  char*           section_str_table;
+  char*           symbol_str_table;
   Elf32_Sym*      table_symbole; /* ajout de la table des symboles*/
   uint32_t        nb_symboles;
   Elf32_Rel* 	  rel_table;

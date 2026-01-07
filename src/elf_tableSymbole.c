@@ -48,7 +48,7 @@ void lire_symbole(FILE* file, elf32_t* elf){
     int index_strtab = symtab.sh_link;
     if (index_strtab < 0 || index_strtab >= elf->header.e_shnum) error("Index .strtab invalide\n");
     
-    elf->section_str_table = (char*) elf->sections[index_strtab].contenu;
+    elf->symbol_str_table = (char*) elf->sections[index_strtab].contenu;
 }
 
 
@@ -99,7 +99,7 @@ void afficher_symboles(elf32_t* elf){
             get_type_string(sym.st_info),
             get_bind_string(sym.st_info),
             get_ndx_string(sym.st_shndx),
-            &elf->section_str_table[sym.st_name]
+            &elf->symbol_str_table[sym.st_name]
 
         );
     }
@@ -161,7 +161,7 @@ elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2){
             fusion->sym_map_elf1[i] = i;
             fusion->nb_sym++;
             //On ajoute notre symbole dans la strtab resultat
-            char *nom_symbole = &elf1->section_str_table[(elf1->table_symbole[i]).st_name];
+            char *nom_symbole = &elf1->symbol_str_table[(elf1->table_symbole[i]).st_name];
             int longueur = strlen(nom_symbole) + 1;
             memcpy(fusion->strtab + fusion->strtab_size, nom_symbole, longueur);
             fusion->strtab_size += longueur;
@@ -174,7 +174,7 @@ elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2){
             fusion->sym_map_elf2[i] = fusion->nb_sym;
             fusion->nb_sym++;
             (elf2->table_symbole[i]).st_name += taille_strtab_elf1 ;
-            char *nom_symbole = &elf2->section_str_table[(elf2->table_symbole[i]).st_name];
+            char *nom_symbole = &elf2->symbol_str_table[(elf2->table_symbole[i]).st_name];
             int longueur = strlen(nom_symbole) + 1;
             memcpy(fusion->strtab + fusion->strtab_size, nom_symbole, longueur);
             fusion->strtab_size += longueur;
@@ -186,7 +186,7 @@ elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2){
     int nb_globaux = 0;
     for (int i = 0; i < (int)elf1->nb_symboles; i++) {
         if (ELF32_ST_BIND(elf1->table_symbole[i].st_info) == STB_GLOBAL) {
-            char *nom_symbole = &elf1->section_str_table[(elf1->table_symbole[i]).st_name];
+            char *nom_symbole = &elf1->symbol_str_table[(elf1->table_symbole[i]).st_name];
             int longueur = strlen(nom_symbole) + 1;
             memcpy(fusion->strtab + fusion->strtab_size, nom_symbole, longueur);
             fusion->strtab_size += longueur;
@@ -201,7 +201,7 @@ elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2){
     //ajout/completion des symboles de elf2
     for (int i = 0; i < (int)elf2->nb_symboles; i++) {
         if (ELF32_ST_BIND(elf2->table_symbole[i].st_info) == STB_GLOBAL) {
-            char *nom_symbole = &elf2->section_str_table[(elf2->table_symbole[i]).st_name];
+            char *nom_symbole = &elf2->symbol_str_table[(elf2->table_symbole[i]).st_name];
 
             // Chercher si déjà dans elf1
             int est_present = 0;
@@ -216,7 +216,7 @@ elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2){
 
             //cas ou il est absent
             if(!est_present){
-                char *nom_symbole = &elf2->section_str_table[(elf2->table_symbole[i]).st_name];
+                char *nom_symbole = &elf2->symbol_str_table[(elf2->table_symbole[i]).st_name];
                 int longueur = strlen(nom_symbole) + 1;
                 memcpy(fusion->strtab + fusion->strtab_size, nom_symbole, longueur);
                 fusion->strtab_size += longueur;

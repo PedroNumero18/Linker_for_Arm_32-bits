@@ -100,8 +100,6 @@ int main(int argc,char *argv[]){
     
     lire_header(inputFile, elf);
     lire_sections(inputFile, elf);
-    printf("DEBUG shstrndx = %u\n", elf->header.e_shstrndx);
-    printf("DEBUG shstrtab first bytes: %.20s\n", elf->section_str_table);
     lire_contenu_sect(inputFile, elf, 6);
     lire_symbole(inputFile, elf);
     lire_Reimple(inputFile, elf);
