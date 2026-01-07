@@ -232,9 +232,8 @@ elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2){
         } else {
             nom_symbole = &elf1->symbol_str_table[elf1->table_symbole[i].st_name];
         }
-            int longueur = (int)strlen(nom_symbole) + 1;
+            int longueur = strlen(nom_symbole) + 1;
             memcpy(fusion->strtab + fusion->strtab_size, nom_symbole, longueur);
-            fusion->strtab_size += longueur;
 
             globaux = realloc(globaux, (nb_globaux + 1) * sizeof(Symboles_globaux));
             if (!globaux) error("realloc globaux\n");
