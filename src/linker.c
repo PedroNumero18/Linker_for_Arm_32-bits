@@ -7,7 +7,7 @@
 
 void print_flags(const char* nom){
     fprintf(stderr,"Usage:\n" 
-           "./%s <option> <result> <filename1> <filename2>\n"
+           "%s <option> <result> <filename1> <filename2>\n"
            "DEFAULT result: a.out\n"
            "fusionne 1 à 2 fichier au format elf pour en faire un executable\n"
            "voici les options:\n"
