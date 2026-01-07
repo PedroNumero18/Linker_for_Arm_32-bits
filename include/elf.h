@@ -247,6 +247,7 @@ void afficher_sections(const elf32_t* elf);
 //Cotenu section
 void lire_contenu_sect( FILE* f, elf32_t *elf, int index);
 int get_section_ind_par_nom(const elf32_t *elf, const char *name);
+const char *get_type(Elf32_Word t);
 void afficher_contenu_section( elf32_t *elf, char *param);
 
 //FUSION SECTION

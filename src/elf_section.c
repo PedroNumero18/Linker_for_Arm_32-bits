@@ -80,6 +80,7 @@ void lire_sections(FILE* file, elf32_t* elf) {
         get_32B(&(elf->sections)[i].h_section.sh_info, file);
         get_32B(&(elf->sections)[i].h_section.sh_addralign, file);
         get_32B(&(elf->sections)[i].h_section.sh_entsize, file);
+        elf->sections[i].contenu = NULL;
     } 
     for(int i= 0; i < elf->header.e_shnum; i++){
        elf->sections[i].contenu = malloc(sizeof(uint8_t) * (elf->sections)[i].h_section.sh_size);
@@ -98,25 +99,29 @@ void afficher_sections(const elf32_t* elf) {
     printf("Il y a %d en-têtes de section, débutant à l'adresse de décalage 0x%x:\n\n",elf->header.e_shnum, elf->header.e_shoff);
     printf("Section Header:\n");
     printf("  [Nr] Nom                  Type               Adr      Décala Taille ES Fan LN Inf Al\n");
-
     for (int i = 0; i < elf->header.e_shnum; i++) {
         const Elf32_Shdr* section = &elf->sections[i].h_section;
         char buff[32];
         printf("  [%2d] %-20s %-18s %08x %06x %06x %02x %3s %2u %2u %2x\n", // ce sont les décalages et les nombres de caractère que je prends pour l'instant
             i,
-            elf->section_str_table + section->sh_name, // nom (plus tard) (une fonction ? / lire dans la string table ?)
-            get_type(section->sh_type),              // type   (ici faudra une fonction pour remplacer le nombre par le bon nom) changer aussi le format dans le print ducoup %-18u par %18-s
+            elf->section_str_table + section->sh_name, // nom 
+            get_type(section->sh_type),              // type   
             section->sh_addr,                        // adresse
             section->sh_offset,                      // décalage
             section->sh_size,                        // taille
             section->sh_entsize,                     // taille entrée
-            get_flags(section->sh_flags,buff),       // flags (ici il faudra une fonction pour remplacer le nombre par le bon nom) changer aussi le format dans le print ducoup %3u par %3s
+            get_flags(section->sh_flags,buff),       // flags 
             section->sh_link,                        // lien
             section->sh_info,                        // info
             section->sh_addralign                    // alignement
         );
     }
-    printf("\n");
+    printf("Clé des fanions : \n"
+    "  W (écriture), A (allocation), X (exécution), M (fusion), S (chaînes), I (info),\n"
+    "  L (ordre des liens), O (traitement supplémentaire par l'OS requis), G (groupe),\n"
+    "  T (TLS), C (compressé), x (inconnu), o (spécifique à l'OS), E (exclu),\n"
+    "  y (purecode), p (processor specific)\n");
+
 }
 
 void lire_contenu_sect( FILE* f, elf32_t *elf, int index) {
@@ -190,13 +195,10 @@ void afficher_contenu_section(elf32_t *elf, char *param){
         return;
     }
     printf("Contenu de la section '%s' (Index %d) :\n", param, index_section);
-    
     for (Elf32_Word i = 0; i < sect->h_section.sh_size; i += 16) {
-
         /* Adresse */
         printf("  0x%08x ", i);
-
-        /* Partie HEX */
+        //HEX
         for (int j = 0; j < 16; j++) {
             if (i + j < sect->h_section.sh_size)
                 printf("%02x", sect->contenu[i + j]);
@@ -206,7 +208,7 @@ void afficher_contenu_section(elf32_t *elf, char *param){
             if ((j + 1) % 4 == 0) printf(" ");
         }
 
-        /* Partie ASCII */
+        //ASCII
         printf(" ");
 
         for (int j = 0; j < 16 && i + j < sect->h_section.sh_size; j++) {
@@ -220,6 +222,7 @@ void afficher_contenu_section(elf32_t *elf, char *param){
         printf("\n");
     }
 }
+
 
 
 elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2) {
