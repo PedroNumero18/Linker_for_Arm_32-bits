@@ -17,16 +17,59 @@ void print_flags(const char* nom){
     return;
 }
 
+void mode_fusion(const char* file1, const char* file2) {
+    FILE* f1 = fopen(file1, "rb");
+    FILE* f2 = fopen(file2, "rb");
+    if (!f1 || !f2) error("Erreur ouverture fichier pour fusion\n");
+
+    elf32_t* elf1 = elf_init();
+    elf32_t* elf2 = elf_init();
+    if (!elf1 || !elf2) error("Erreur allocation ELF\n");
+
+    lire_header(f1, elf1);
+    lire_sections(f1, elf1);
+    lire_symbole(f1, elf1);
+    lire_Reimple(f1, elf1);
+
+    lire_header(f2, elf2);
+    lire_sections(f2, elf2);
+    lire_symbole(f2, elf2);
+    lire_Reimple(f2, elf2);
+
+    //fusion
+    elf32_fusion_sections* fusion = fusion_sections(elf1, elf2);
+    if (!fusion) error("Erreur fusion des sections\n");
+
+    printf("\n===== FUSION DES SECTIONS =====\n");
+    printf("Nombre de sections après fusion : %d\n\n", fusion->nb_sections);
+
+   elf32_t elf_fusion_fake;
+    elf_fusion_fake.header.e_shnum = fusion->nb_sections;
+    elf_fusion_fake.header.e_shoff = 0;
+    elf_fusion_fake.sections = fusion->sections;
+
+    elf_fusion_fake.section_str_table = elf1->section_str_table;
+    afficher_sections(&elf_fusion_fake);
+
+    printf("\n===== CONTENU DE LA SECTION 1 APRÈS FUSION =====\n");
+    afficher_contenu_section(&elf_fusion_fake, "1");
+
+    elf_free(elf1);
+    elf_free(elf2);
+    fclose(f1);
+    fclose(f2);
+}
+
 int main(int argc, char** argv){
     int opt;
-    char *filename1 = NULL, *filename2 = NULL, *result = "a.out";
-    FILE *file1, *file2, *output;
+    char *filename1 = NULL, *filename2 = NULL; //*result = "a.out";
+    FILE *file1, *file2;// *output;
 
 
     while(  (   opt = getopt(argc, argv, "ho:")   ) != -1){
         switch (opt){
             case 'h': print_flags(argv[0]); return 0;                               break;
-            case 'o': result = optarg;                                              break; 
+            case 'o': /*result = optarg; */                                            break; 
             default: print_flags(argv[0]); error("cette option n'existe pas !!!");  break;
         }
     }
@@ -49,7 +92,46 @@ int main(int argc, char** argv){
     lire_symbole(file1, elf1);  lire_symbole(file2, elf2);
     lire_Reimple(file1, elf1);  lire_Reimple(file2, elf2);
     elf32_fusion_sections* fusionSec = fusion_sections(elf1, elf2);
-    elf32_fusion_symboles* fusionSym = fusion_symboles(elf1, elf2);
+    if (!fusionSec) error("Erreur fusion des sections\n");
+    
+    printf("\n===== FUSION DES SECTIONS =====\n");
+    printf("Nombre de sections après fusion : %d\n\n", fusionSec->nb_sections);
 
+    elf32_t elf_fusion_fake;
+    elf_fusion_fake.header.e_shnum = fusionSec->nb_sections;
+    elf_fusion_fake.header.e_shoff = 0;
+    elf_fusion_fake.sections = fusionSec->sections;
+
+    elf_fusion_fake.section_str_table = elf1->section_str_table;
+    afficher_sections(&elf_fusion_fake);
+
+    printf("\n===== CONTENU DE LA SECTION 1 APRÈS FUSION =====\n");
+    afficher_contenu_section(&elf_fusion_fake, "1");
+
+    elf32_fusion_symboles* fusionSymb = fusion_symboles(elf1, elf2);
+    if (!fusionSymb) error("erreur fusion symbole");
+
+    printf("\n===== FUSION DES SYMBOLE =====\n");
+    /* ==== FUSION ==== */
+    elf32_fusion_symboles *fusion = fusion_symboles(elf1, elf2);
+    if (!fusion) error("Erreur fusion_symboles\n");
+
+        /* Faux ELF pour réutiliser afficher_symboles */
+    elf32_t elf_fusion = {0};
+    elf_fusion.header.e_shnum      = elf1->header.e_shnum;      // pour STT_SECTION
+    elf_fusion.sections            = elf1->sections;            // réutilise les mêmes sections
+    elf_fusion.section_str_table   = elf1->section_str_table;   // noms de sections
+    elf_fusion.table_symbole       = fusion->table_symbole;    // table fusionnée
+    elf_fusion.nb_symboles         = fusion->nb_sym;
+    elf_fusion.symbol_str_table    = fusion->strtab;           // strtab fusionnée
+
+    printf("\n===== SYMBOLES FUSIONNES =====\n");
+    afficher_symboles(&elf_fusion);
+
+
+    elf_free(elf1);
+    elf_free(elf2);
+    fclose(file1);
+    fclose(file2);
     return 0;
 }
