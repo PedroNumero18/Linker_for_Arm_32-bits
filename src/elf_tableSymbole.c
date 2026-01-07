@@ -48,7 +48,7 @@ void lire_symbole(FILE* file, elf32_t* elf){
     int index_strtab = symtab.sh_link;
     if (index_strtab < 0 || index_strtab >= elf->header.e_shnum) error("Index .strtab invalide\n");
     
-    elf->section_str_table = (char*) elf->sections[index_strtab].contenu;
+    elf->symbol_str_table = (char*) elf->sections[index_strtab].contenu;
 }
 
 

@@ -40,22 +40,53 @@ void lire_header(FILE* file, elf32_t* elf){
 
 }
 
+void affichage_flags(uint32_t flags) {
+    if (flags == 0) {
+        return;
+    }
+    
+    printf(", ");
+    
+    // Version de l'EABI
+    uint32_t eabi_version = (flags & 0xFF000000) >> 24;
+    if (eabi_version >= 1 && eabi_version <= 5) {
+        printf("Version%d EABI", eabi_version);
+    }
+    
+    // Flags spécifiques
+    int first_flag = (eabi_version == 0);
+    
+    if (flags & 0x200) {  // EF_ARM_SOFT_FLOAT
+        if (!first_flag) printf(", ");
+        printf("soft-float ABI");
+        first_flag = 0;
+    }
+    
+    if (flags & 0x400) {  // EF_ARM_VFP_FLOAT
+        if (!first_flag) printf(", ");
+        printf("hard-float ABI");
+        first_flag = 0;
+    }
+}
+
 void affichage_entete(Elf32_Ehdr* header){
     //Faudra changer pour que le texte corresponde mais pour l'instant j'ai ça
     if (!header) error("Erreur d'initialisation d'header\n");
 
-    printf("ELF Header :\n");
+    printf("ELF Header:\n");
+    
     /* Magic */
-    printf("  Magique:   ");
+    printf("  Magic:   ");
     for (int i = 0; i < EI_NIDENT; i++) printf("%02x ", header->e_ident[i]);
     printf("\n");
 
     /* Classe */
-    if (header->e_ident[EI_CLASS] == ELFCLASS32) printf("  Classe:                            ELF32\n");
+    if (header->e_ident[EI_CLASS] == ELFCLASS32) printf("  Class:                             ELF32\n");
 
     /* Endianness */
-    if (header->e_ident[EI_DATA] == ELFDATA2MSB) printf("  Données:                           Big endian\n");
-    else                                         printf("  Données:                           Little endian\n");
+    printf("  Data:                              ");
+    if (header->e_ident[EI_DATA] == ELFDATA2MSB) printf("2's complement, big endian\n");
+    else                                         printf("2's complement, little endian\n");
 
     /* Version ELF */
     printf("  Version:                           %u (current)\n",header->e_ident[EI_VERSION]);
@@ -68,31 +99,36 @@ void affichage_entete(Elf32_Ehdr* header){
     }
 
     /* ABI version */
-    printf("  Version ABI:                       %u\n",header->e_ident[EI_ABIVERSION]);
+    printf("  ABI Version:                       %d\n", header->e_ident[EI_ABIVERSION]);
 
-    /* Type */
+    printf("  Type:                              ");
     switch (header->e_type) {
-        case ET_REL:  printf("  Type:                              REL (Relocatable)\n"); break;
-        case ET_EXEC: printf("  Type:                              EXEC (Executable)\n"); break;
-        default:      printf("  Type:                              Autre\n"); break;
+        case ET_NONE: printf("NONE (Unknown)\n"); break;
+        case ET_REL:  printf("REL (Relocatable file)\n"); break;
+        case ET_EXEC: printf("EXEC (Executable file)\n"); break;
+        case ET_DYN:  printf("DYN (Shared object file)\n"); break;
+        default:      printf("<unknown: %d>\n", header->e_type); break;
     }
 
     /* Machine */
-    if (header->e_machine == EM_ARM)    printf("  Machine:                           ARM\n");
+    printf("  Machine:                           ");
+    if (header->e_machine == EM_ARM) printf("ARM\n");
+    else printf("<unknown: %d>\n", header->e_machine);
 
-    /* Version */
+    /*Version*/
     printf("  Version:                           0x%x\n", header->e_version);
-    printf("  Adresse du point d'entrée:         0x%x\n", header->e_entry);
-    printf("  Début des en-têtes de programme:   %u (bytes dans le fichier)\n", header->e_phoff);
-    printf("  Début des en-têtes de section:     %u (bytes dans le fichier)\n", header->e_shoff);
-    printf("  Fanions:                           0x%x\n", header->e_flags);
-    printf("  Taille de cet en-tête:             %u (bytes)\n", header->e_ehsize);
-    printf("  Taille entrée programme:           %u (bytes)\n", header->e_phentsize);
-    printf("  Nombre entrées programme:          %u\n", header->e_phnum);
-    printf("  Taille entrée section:             %u (bytes)\n", header->e_shentsize);
-    printf("  Nombre entrées section:            %u\n", header->e_shnum);
-    printf("  Table d'index des chaînes d'en-tête de section: %u\n", header->e_shstrndx);
+    printf("  Entry point address:               0x%x\n", header->e_entry);
+    printf("  Start of program headers:          %u (bytes into file)\n", header->e_phoff);
+    printf("  Start of section headers:          %u (bytes into file)\n", header->e_shoff);
+    printf("  Flags:                             0x%x", header->e_flags);
+    if(header->e_machine == EM_ARM) affichage_flags(header->e_flags);
     printf("\n");
+    printf("  Size of this header:               %u (bytes)\n", header->e_ehsize);
+    printf("  Size of program headers:           %u (bytes)\n", header->e_phentsize);
+    printf("  Number of program headers:         %u\n", header->e_phnum);
+    printf("  Size of section headers:           %u (bytes)\n", header->e_shentsize);
+    printf("  Number of section headers:         %u\n", header->e_shnum);
+    printf("  Section header string table index: %u\n", header->e_shstrndx);
 }
 
 

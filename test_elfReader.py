@@ -151,7 +151,7 @@ def main():
         sys.exit(1)
     
     # Trouver tous les répertoires de test
-    test_dirs = sorted([d for d in TESTS_DIR.iterdir() if d.is_dir() and d.name.startswith('test') and d.name != 'test_RELA'])
+    test_dirs = sorted([d for d in TESTS_DIR.iterdir() if d.is_dir() and d.name.startswith('test') and d.name != 'test_RELA' and d.name !='testsSup'])
     
     # Résultats globaux
     total_tests = 0

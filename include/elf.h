@@ -222,7 +222,8 @@ typedef struct {
 typedef struct { 
   Elf32_Ehdr      header ;
   elf32_sections* sections;
-  char*           section_str_table;	
+  char*           section_str_table;	/* .shstrtab pour les noms des sections */
+  char*           symbol_str_table;   /* .strtab pour les noms des symboles */
   Elf32_Sym*      table_symbole; /* ajout de la table des symboles*/
   uint32_t        nb_symboles;
   Elf32_Rel* 	  rel_table;
@@ -257,6 +258,7 @@ void free_fusion_sections(elf32_fusion_sections* fusion);
 void lire_symbole(FILE* file, elf32_t* elf);
 const char* get_type_string(unsigned char info);
 const char* get_bind_string(unsigned char info);
+const char* get_vis_string(unsigned char other);
 const char* get_ndx_string(Elf32_Half shndx);
 void afficher_symboles(elf32_t* elf);
 
