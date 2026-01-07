@@ -32,7 +32,6 @@ void lire_symbole(FILE* file, elf32_t* elf){
     if (elf->table_symbole == NULL) error("Erreur malloc table des symboles\n");
 
     elf->nb_symboles = nb_symboles;
-    printf("Nombre de symboles : %u\n", elf->nb_symboles);
     
     //debut de la table
     fseek(file, symtab.sh_offset, SEEK_SET);
