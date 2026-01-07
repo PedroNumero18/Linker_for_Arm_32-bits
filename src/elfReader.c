@@ -100,13 +100,9 @@ int main(int argc,char *argv[]){
     
     lire_header(inputFile, elf);
     lire_sections(inputFile, elf);
-
-    lire_contenu_sect(inputFile, elf, 6);
-        printf("DEBUG MAIN avant lire_symbole: nb_symboles = %d\n", elf->nb_symboles);
+    //lire_contenu_sect(inputFile, elf, 6);
     lire_symbole(inputFile, elf);
-        printf("DEBUG MAIN après lire_symbole: nb_symboles = %d\n", elf->nb_symboles);
     lire_Reimple(inputFile, elf);
-        printf("DEBUG MAIN après lire_Reimple: nb_symboles = %d\n", elf->nb_symboles);
     
 
     if(h_flag || a_flag){affichage_entete(&elf->header);}

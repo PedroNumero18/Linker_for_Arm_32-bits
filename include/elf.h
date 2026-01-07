@@ -63,6 +63,8 @@ extern char* filename;   //Nom de fichier défini dans le main
 #define SHT_HIUSER         0xffffffff
 #define SHT_ARM_ATTRIBUTES 0x70000003U
 
+#define SHN_UNDEF 0 //indéfini
+
 
 //sh_flags 
 #define SHF_WRITE              (1 << 0)        /* Writable */
