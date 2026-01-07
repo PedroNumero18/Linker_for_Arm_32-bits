@@ -173,6 +173,16 @@ elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2){
             fusion->nb_sym++;
             //On ajoute notre symbole dans la strtab resultat
             char *nom_symbole = &elf1->symbol_str_table[(elf1->table_symbole[i]).st_name];
+            if (ELF32_ST_TYPE(elf1->table_symbole[i].st_info) == STT_SECTION) {
+            if (elf1->table_symbole[i].st_shndx < elf1->header.e_shnum && elf1->table_symbole[i].st_shndx != SHN_UNDEF) {
+                Elf32_Shdr sec = elf1->sections[elf1->table_symbole[i].st_shndx].h_section;
+                nom_symbole = &elf1->section_str_table[sec.sh_name];
+            } else {
+                nom_symbole = "";
+            }
+        } else {
+            nom_symbole = &elf1->symbol_str_table[elf1->table_symbole[i].st_name];
+        }
             int longueur = strlen(nom_symbole) + 1;
             memcpy(fusion->strtab + fusion->strtab_size, nom_symbole, longueur);
             fusion->strtab_size += longueur;
@@ -186,6 +196,16 @@ elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2){
             fusion->nb_sym++;
             (elf2->table_symbole[i]).st_name += taille_strtab_elf1 ;
             char *nom_symbole = &elf2->symbol_str_table[(elf2->table_symbole[i]).st_name];
+            if (ELF32_ST_TYPE(elf2->table_symbole[i].st_info) == STT_SECTION) {
+            if (elf2->table_symbole[i].st_shndx < elf2->header.e_shnum && elf2->table_symbole[i].st_shndx != SHN_UNDEF) {
+                Elf32_Shdr sec = elf2->sections[elf2->table_symbole[i].st_shndx].h_section;
+                nom_symbole = &elf2->section_str_table[sec.sh_name];
+            } else {
+                nom_symbole = "";
+            }
+        } else {
+            nom_symbole = &elf2->symbol_str_table[elf2->table_symbole[i].st_name];
+        }
             int longueur = strlen(nom_symbole) + 1;
             memcpy(fusion->strtab + fusion->strtab_size, nom_symbole, longueur);
             fusion->strtab_size += longueur;
@@ -198,6 +218,16 @@ elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2){
     for (int i = 0; i < (int)elf1->nb_symboles; i++) {
         if (ELF32_ST_BIND(elf1->table_symbole[i].st_info) == STB_GLOBAL) {
             char *nom_symbole = &elf1->symbol_str_table[(elf1->table_symbole[i]).st_name];
+            if (ELF32_ST_TYPE(elf1->table_symbole[i].st_info) == STT_SECTION) {
+            if (elf1->table_symbole[i].st_shndx < elf1->header.e_shnum && elf1->table_symbole[i].st_shndx != SHN_UNDEF) {
+                Elf32_Shdr sec = elf1->sections[elf1->table_symbole[i].st_shndx].h_section;
+                nom_symbole = &elf1->section_str_table[sec.sh_name];
+            } else {
+                nom_symbole = "";
+            }
+        } else {
+            nom_symbole = &elf1->symbol_str_table[elf1->table_symbole[i].st_name];
+        }
             int longueur = strlen(nom_symbole) + 1;
             memcpy(fusion->strtab + fusion->strtab_size, nom_symbole, longueur);
             fusion->strtab_size += longueur;
@@ -212,7 +242,17 @@ elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2){
     //ajout/completion des symboles de elf2
     for (int i = 0; i < (int)elf2->nb_symboles; i++) {
         if (ELF32_ST_BIND(elf2->table_symbole[i].st_info) == STB_GLOBAL) {
-            char *nom_symbole = &elf2->symbol_str_table[(elf2->table_symbole[i]).st_name];
+           char *nom_symbole = &elf2->symbol_str_table[(elf2->table_symbole[i]).st_name];
+            if (ELF32_ST_TYPE(elf2->table_symbole[i].st_info) == STT_SECTION) {
+            if (elf2->table_symbole[i].st_shndx < elf2->header.e_shnum && elf2->table_symbole[i].st_shndx != SHN_UNDEF) {
+                Elf32_Shdr sec = elf2->sections[elf2->table_symbole[i].st_shndx].h_section;
+                nom_symbole = &elf2->section_str_table[sec.sh_name];
+            } else {
+                nom_symbole = "";
+            }
+        } else {
+            nom_symbole = &elf2->symbol_str_table[elf2->table_symbole[i].st_name];
+        }
 
             // Chercher si déjà dans elf1
             int est_present = 0;
@@ -228,6 +268,16 @@ elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2){
             //cas ou il est absent
             if(!est_present){
                 char *nom_symbole = &elf2->symbol_str_table[(elf2->table_symbole[i]).st_name];
+            if (ELF32_ST_TYPE(elf2->table_symbole[i].st_info) == STT_SECTION) {
+            if (elf2->table_symbole[i].st_shndx < elf2->header.e_shnum && elf2->table_symbole[i].st_shndx != SHN_UNDEF) {
+                Elf32_Shdr sec = elf2->sections[elf2->table_symbole[i].st_shndx].h_section;
+                nom_symbole = &elf2->section_str_table[sec.sh_name];
+            } else {
+                nom_symbole = "";
+            }
+        } else {
+            nom_symbole = &elf2->symbol_str_table[elf2->table_symbole[i].st_name];
+        }
                 int longueur = strlen(nom_symbole) + 1;
                 memcpy(fusion->strtab + fusion->strtab_size, nom_symbole, longueur);
                 fusion->strtab_size += longueur;

@@ -19,7 +19,7 @@ void print_flags(const char* nom){
 
 int main(int argc, char** argv){
     int opt;
-    char* filename1 = NULL, filename2 = NULL, result = "a.out";
+    char *filename1 = NULL, *filename2 = NULL, *result = "a.out";
     FILE *file1, *file2, *output;
 
 
