@@ -17,48 +17,6 @@ void print_flags(const char* nom){
     return;
 }
 
-void mode_fusion(const char* file1, const char* file2) {
-    FILE* f1 = fopen(file1, "rb");
-    FILE* f2 = fopen(file2, "rb");
-    if (!f1 || !f2) error("Erreur ouverture fichier pour fusion\n");
-
-    elf32_t* elf1 = elf_init();
-    elf32_t* elf2 = elf_init();
-    if (!elf1 || !elf2) error("Erreur allocation ELF\n");
-
-    lire_header(f1, elf1);
-    lire_sections(f1, elf1);
-    lire_symbole(f1, elf1);
-    lire_Reimple(f1, elf1);
-
-    lire_header(f2, elf2);
-    lire_sections(f2, elf2);
-    lire_symbole(f2, elf2);
-    lire_Reimple(f2, elf2);
-
-    //fusion
-    elf32_fusion_sections* fusion = fusion_sections(elf1, elf2);
-    if (!fusion) error("Erreur fusion des sections\n");
-
-    printf("\n===== FUSION DES SECTIONS =====\n");
-    printf("Nombre de sections après fusion : %d\n\n", fusion->nb_sections);
-
-   elf32_t elf_fusion_fake;
-    elf_fusion_fake.header.e_shnum = fusion->nb_sections;
-    elf_fusion_fake.header.e_shoff = 0;
-    elf_fusion_fake.sections = fusion->sections;
-
-    elf_fusion_fake.section_str_table = elf1->section_str_table;
-    afficher_sections(&elf_fusion_fake);
-
-    printf("\n===== CONTENU DE LA SECTION 1 APRÈS FUSION =====\n");
-    afficher_contenu_section(&elf_fusion_fake, "1");
-
-    elf_free(elf1);
-    elf_free(elf2);
-    fclose(f1);
-    fclose(f2);
-}
 
 int main(int argc, char** argv){
     int opt;
@@ -91,8 +49,11 @@ int main(int argc, char** argv){
     lire_sections(file1, elf1); lire_sections(file2, elf2);
     lire_symbole(file1, elf1);  lire_symbole(file2, elf2);
     lire_Reimple(file1, elf1);  lire_Reimple(file2, elf2);
+
+
     elf32_fusion_sections* fusionSec = fusion_sections(elf1, elf2);
     if (!fusionSec) error("Erreur fusion des sections\n");
+    //reconstruire_shstrtab(fusionSec);
     
     printf("\n===== FUSION DES SECTIONS =====\n");
     printf("Nombre de sections après fusion : %d\n\n", fusionSec->nb_sections);
@@ -102,11 +63,11 @@ int main(int argc, char** argv){
     elf_fusion_fake.header.e_shoff = 0;
     elf_fusion_fake.sections = fusionSec->sections;
 
-    elf_fusion_fake.section_str_table = elf1->section_str_table;
+    elf_fusion_fake.section_str_table =(char*)fusionSec->sections[fusionSec->nb_sections - 1].contenu;
     afficher_sections(&elf_fusion_fake);
 
     printf("\n===== CONTENU DE LA SECTION 1 APRÈS FUSION =====\n");
-    afficher_contenu_section(&elf_fusion_fake, "1");
+    afficher_contenu_section(&elf_fusion_fake, "6");
 
     elf32_fusion_symboles* fusionSymb = fusion_symboles(elf1, elf2);
     if (!fusionSymb) error("erreur fusion symbole");

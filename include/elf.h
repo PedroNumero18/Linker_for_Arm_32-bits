@@ -203,11 +203,19 @@ typedef struct {
 
 /*etape6 fusion des sections*/
 typedef struct {
-   elf32_sections* sections;   
-   int  nb_sections;
-   int* section_map_elf2;
-   int* section_offset_elf2;
- } elf32_fusion_sections;
+    int ancien_index;      // index dans ELF2
+    int nouvel_index;      // index dans le fichier fusion
+    uint32_t offset;    // offset de concaténation
+} section_map_t;
+
+typedef struct {
+    elf32_sections *sections;
+    int nb_sections;
+    section_map_t *map_elf2; 
+    int nb_map;
+	char *shstrtab_orig;
+} elf32_fusion_sections;
+
 
 /* Table de symboles fusionnée (symtab de sortie) */
  typedef struct {
@@ -256,6 +264,7 @@ void afficher_contenu_section( elf32_t *elf, char *param);
 //FUSION SECTION
 elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2);
 void free_fusion_sections(elf32_fusion_sections* fusion);
+
 
 //Table des symboles
 void lire_symbole(FILE* file, elf32_t* elf);
