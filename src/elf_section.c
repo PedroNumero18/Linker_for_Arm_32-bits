@@ -224,6 +224,21 @@ void afficher_contenu_section(elf32_t *elf, char *param){
 }
 
 
+uint32_t calculer_e_shoff(const elf32_fusion_sections* fusion) {
+    uint32_t offset = sizeof(Elf32_Ehdr);
+
+    for (int i = 0; i < fusion->nb_sections; i++) {
+        Elf32_Shdr *sh = &fusion->sections[i].h_section;
+
+        if (sh->sh_type != SHT_NOBITS) {
+            offset += sh->sh_size;
+        }
+    }
+
+    return offset;
+}
+
+
 
 static int est_fusionnable(const Elf32_Shdr *s) {
     return (s->sh_type == SHT_PROGBITS) &&
@@ -364,3 +379,5 @@ elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2) {
 
     return fusion;
 }
+
+

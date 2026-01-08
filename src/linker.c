@@ -60,10 +60,10 @@ int main(int argc, char** argv){
 
     elf32_t elf_fusion_fake;
     elf_fusion_fake.header.e_shnum = fusionSec->nb_sections;
-    elf_fusion_fake.header.e_shoff = 0;
+    elf_fusion_fake.header.e_shoff = calculer_e_shoff(fusionSec);
     elf_fusion_fake.sections = fusionSec->sections;
 
-    elf_fusion_fake.section_str_table =(char*)fusionSec->sections[fusionSec->nb_sections - 1].contenu;
+    elf_fusion_fake.section_str_table = fusionSec->section_str_table;
     afficher_sections(&elf_fusion_fake);
 
     printf("\n===== CONTENU DE LA SECTION 6 APRÈS FUSION =====\n");

@@ -265,6 +265,7 @@ void afficher_contenu_section( elf32_t *elf, char *param);
 
 //FUSION SECTION
 elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2);
+uint32_t calculer_e_shoff(const elf32_fusion_sections* fusion);
 void free_fusion_sections(elf32_fusion_sections* fusion);
 
 
