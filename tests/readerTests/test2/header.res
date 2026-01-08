@@ -5,16 +5,16 @@ ELF Header:
   Version:                           1 (current)
   OS/ABI:                            UNIX - System V
   ABI Version:                       0
-  Type:                              EXEC (Executable file)
+  Type:                              REL (Relocatable file)
   Machine:                           ARM
   Version:                           0x1
-  Entry point address:               0x8000
-  Start of program headers:          52 (bytes into file)
-  Start of section headers:          33372 (bytes into file)
-  Flags:                             0x5000200, Version5 EABI, soft-float ABI
+  Entry point address:               0x0
+  Start of program headers:          0 (bytes into file)
+  Start of section headers:          428 (bytes into file)
+  Flags:                             0x5000000, Version5 EABI
   Size of this header:               52 (bytes)
-  Size of program headers:           32 (bytes)
-  Number of program headers:         1
+  Size of program headers:           0 (bytes)
+  Number of program headers:         0
   Size of section headers:           40 (bytes)
-  Number of section headers:         9
-  Section header string table index: 8
+  Number of section headers:         10
+  Section header string table index: 9

@@ -30,16 +30,38 @@ début de l'implémentation de la table des symboles
 formatage du code pour une meilleure lisibilité
 ```
 
-### Pendant les vacances :
+### Vendredi 19 Décembre 2025 :
 ```{text}
 Finalisation table symbole (modif pour les String) et vérification pour savoir si elle marche
 quelques modifs mineur sur le main
 modif table Reimpl (a tester avec un fichier avec des readresage a faire)
 ```
 
-### Lundi 05 Janvier 2025
+### Lundi 05 Janvier 2026:
 ``` {text}
 Préparation de la diapo
 début de la phase 2
 création de la structure elf32_fusion_sections
+début 
 ```
+
+## Mardi 06 Janvier 2026:
+```{text}
+avancement de la fusion des sections 
+début de la fusion des symboles 
+```
+
+## Mercredi 07 Janvier 2026:
+```{text}
+avancement de la fusion des symboles
+tentative de débugage de la fusion des sections
+debut de la fusion des reimplantation
+```
+
+## Jeudi 08 Janvier 2026:
+```{text}
+avancement de la fusion des reimplantation
+Rédaction du README.md 
+ajout de fonction d'affichage pour debug les fusions 
+```
+
