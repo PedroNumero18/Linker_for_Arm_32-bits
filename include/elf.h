@@ -308,6 +308,7 @@ void afficher_contenu_section( elf32_t *elf, char *param);
 elf32_fusion_sections* fusion_sect_init();
 elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2);
 uint32_t calculer_e_shoff(const elf32_fusion_sections* fusion);
+void afficher_fusion_sections(elf32_fusion_sections* fusion);
 void free_fusion_sections(elf32_fusion_sections* fusion);
 
 
@@ -321,6 +322,7 @@ void afficher_symboles(elf32_t* elf);
 
 //FUSION SYMBOLE
 elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2);
+void afficher_fusion_symboles(elf32_fusion_symboles* fusion);
 
 //REIMPLEMENTATION
 void lire_Reimple(FILE* file, elf32_t* elf);

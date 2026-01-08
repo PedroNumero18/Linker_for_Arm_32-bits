@@ -58,33 +58,13 @@ int main(int argc, char** argv){
     printf("\n===== FUSION DES SECTIONS =====\n");
     printf("Nombre de sections après fusion : %d\n\n", fusionSec->nb_sections);
 
-    elf32_t elf_fusion_fake;
-    elf_fusion_fake.header.e_shnum = fusionSec->nb_sections;
-    elf_fusion_fake.header.e_shoff = calculer_e_shoff(fusionSec);
-    elf_fusion_fake.sections = fusionSec->sections;
-
-    elf_fusion_fake.section_str_table = fusionSec->section_str_table;
-    afficher_sections(&elf_fusion_fake);
-
-    printf("\n===== CONTENU DE LA SECTION 6 APRÈS FUSION =====\n");
-    afficher_contenu_section(&elf_fusion_fake, "6");
+    afficher_fusion_sections(fusionSec);
 
     printf("\n===== FUSION DES SYMBOLE =====\n");
     /* ==== FUSION ==== */
     elf32_fusion_symboles *fusionSymb = fusion_symboles(elf1, elf2);
     if (!fusionSymb) error("Erreur fusion_symboles\n");
-
-        /* Faux ELF pour réutiliser afficher_symboles */
-    elf32_t elf_fusion = {0};
-    elf_fusion.header.e_shnum      = elf1->header.e_shnum;          // pour STT_SECTION
-    elf_fusion.sections            = elf1->sections;                // réutilise les mêmes sections
-    elf_fusion.section_str_table   = elf1->section_str_table;       // noms de sections
-    elf_fusion.table_symbole       = fusionSymb->table_symbole;     // table fusionnée
-    elf_fusion.nb_symboles         = fusionSymb->nb_sym;
-    elf_fusion.symbol_str_table    = fusionSymb->strtab;            // strtab fusionnée
-
-    printf("\n===== SYMBOLES FUSIONNES =====\n");
-    afficher_symboles(&elf_fusion);
+    afficher_fusion_symboles(fusionSymb);
 
     printf("\n===== REIMPL FUSIONNES =====\n");
     elf32_fusion_reimpl* fusionReimpl = fusion_reimpl(elf1, elf2, fusionSec, fusionSymb);
