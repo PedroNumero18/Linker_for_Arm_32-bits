@@ -51,7 +51,6 @@ void lire_symbole(FILE* file, elf32_t* elf){
     elf->symbol_str_table = (char*) elf->sections[index_strtab].contenu;
 }
 
-
 const char* get_type_string(unsigned char info){
     switch(ELF32_ST_TYPE(info)){
         case STT_NOTYPE:  return "NOTYPE";
@@ -63,7 +62,6 @@ const char* get_type_string(unsigned char info){
     }
 }
 
-
 const char* get_bind_string(unsigned char info){
     switch(ELF32_ST_BIND(info)){
         case STB_LOCAL:  return "LOCAL";
@@ -72,7 +70,6 @@ const char* get_bind_string(unsigned char info){
         default:         return "UNKNOWN";
     }
 }
-
 
 const char* get_ndx_string(Elf32_Half shndx){
     static char buffer[16]; 
@@ -84,23 +81,49 @@ const char* get_ndx_string(Elf32_Half shndx){
     }
 }
 
-
+const char* get_vis_string(unsigned char vis) {
+    switch (vis) {
+        case STV_DEFAULT:   return "DEFAULT";
+        case STV_INTERNAL:  return "INTERNAL";
+        case STV_HIDDEN:    return "HIDDEN";
+        case STV_PROTECTED: return "PROTECTED";
+        default:            return "UNKNOWN";
+    }
+}
 
 void afficher_symboles(elf32_t* elf){
-    printf("\nTable des symboles:\n");
-    printf("Num  Value     Size Type    Bind   Ndx Name\n");
+    if (!elf || !elf->table_symbole || elf->nb_symboles == 0) {
+        printf("\nNo symbols in this file.\n");
+        return;
+    }
+    
+    printf("Symbol table '.symtab' contains %u entries:\n", elf->nb_symboles);
+    printf("   Num:    Value  Size Type    Bind   Vis      Ndx Name\n");
+    
     for (uint32_t i = 0; i < elf->nb_symboles; i++){
         Elf32_Sym sym = elf->table_symbole[i];
-
-        printf("%3d  %08x %5d %-7s %-6s %3s %s\n",
-            i,
-            sym.st_value,
-            sym.st_size,
-            get_type_string(sym.st_info),
-            get_bind_string(sym.st_info),
-            get_ndx_string(sym.st_shndx),
-            &elf->section_str_table[sym.st_name]
-
+        
+        const char* sym_name = "";
+        unsigned char type = ELF32_ST_TYPE(sym.st_info);
+        
+        if (type == STT_SECTION && sym.st_shndx > 0 && sym.st_shndx < elf->header.e_shnum) {
+            Elf32_Word section_name_offset = elf->sections[sym.st_shndx].h_section.sh_name;
+            if (elf->section_str_table && section_name_offset > 0) {
+                sym_name = &elf->section_str_table[section_name_offset];
+            }
+        } else if (elf->symbol_str_table && sym.st_name > 0) {
+            sym_name = &elf->symbol_str_table[sym.st_name];
+        }
+        
+        printf("%6u: %08x %5u %-7s %-6s %-8s %3s %s\n",
+               i,
+               sym.st_value,
+               sym.st_size,
+               get_type_string(type),
+               get_bind_string(sym.st_info),
+               get_vis_string(ELF32_ST_VISIBILITY(sym.st_other)),
+               get_ndx_string(sym.st_shndx),
+               sym_name
         );
     }
 }

@@ -109,6 +109,7 @@ extern char* filename;   //Nom de fichier défini dans le main
 #define ELF32_ST_BIND(i) ((i)>>4)
 #define ELF32_ST_TYPE(i) ((i)&0xf)
 #define ELF32_ST_INFO(b,t) (((b)<<4)+((t)&0xf))
+#define ELF32_ST_VISIBILITY(o) ((o) & 0x3)
 
 /*  gérer les infos lors des reimplemenntationns */
 #define ELF32_R_SYM(i) ((i)>>8)

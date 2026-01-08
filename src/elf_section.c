@@ -93,30 +93,40 @@ void lire_sections(FILE* file, elf32_t* elf) {
 }
 
 void afficher_sections(const elf32_t* elf) {
-    if (elf == NULL || (elf->sections) == NULL) error( "Sections non chargées\n");
-
-    printf("Il y a %d en-têtes de section, débutant à l'adresse de décalage 0x%x:\n\n",elf->header.e_shnum, elf->header.e_shoff);
-    printf("Section Header:\n");
-    printf("  [Nr] Nom                  Type               Adr      Décala Taille ES Fan LN Inf Al\n");
-
+    if (elf == NULL || (elf->sections) == NULL) 
+        error("Sections non chargées\n");
+    
+    printf("There are %d section headers, starting at offset 0x%x:\n\n", 
+           elf->header.e_shnum, elf->header.e_shoff);
+    
+    printf("Section Headers:\n");
+    printf("  [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al\n");
+    
     for (int i = 0; i < elf->header.e_shnum; i++) {
         const Elf32_Shdr* section = &elf->sections[i].h_section;
-        char buff[32];
-        printf("  [%2d] %-20s %-18s %08x %06x %06x %02x %3s %2u %2u %2x\n", // ce sont les décalages et les nombres de caractère que je prends pour l'instant
-            i,
-            elf->section_str_table + section->sh_name, // nom (plus tard) (une fonction ? / lire dans la string table ?)
-            get_type(section->sh_type),              // type   (ici faudra une fonction pour remplacer le nombre par le bon nom) changer aussi le format dans le print ducoup %-18u par %18-s
-            section->sh_addr,                        // adresse
-            section->sh_offset,                      // décalage
-            section->sh_size,                        // taille
-            section->sh_entsize,                     // taille entrée
-            get_flags(section->sh_flags,buff),       // flags (ici il faudra une fonction pour remplacer le nombre par le bon nom) changer aussi le format dans le print ducoup %3u par %3s
-            section->sh_link,                        // lien
-            section->sh_info,                        // info
-            section->sh_addralign                    // alignement
+        char flags_buff[4] = {0};  // Pour les flags (max 3 caractères + '\0')
+        
+        printf("  [%2d] %-17s %-15s %08x %06x %06x %02x %3s %2u %3u %2u\n",
+               i,
+               elf->section_str_table + section->sh_name,  // Nom
+               get_type(section->sh_type),                 // Type
+               section->sh_addr,                           // Addr
+               section->sh_offset,                         // Off
+               section->sh_size,                           // Size
+               section->sh_entsize,                        // ES (Entry Size)
+               get_flags(section->sh_flags, flags_buff),   // Flg
+               section->sh_link,                           // Lk
+               section->sh_info,                           // Inf
+               section->sh_addralign                       // Al
         );
     }
-    printf("\n");
+    
+    printf( "Key to Flags:\n"
+            "  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),\n"
+            "  L (link order), O (extra OS processing required), G (group), T (TLS),\n"
+            "  C (compressed), x (unknown), o (OS specific), E (exclude),\n"
+            "  D (mbind), y (purecode), p (processor specific)\n"
+        );
 }
 
 void lire_contenu_sect( FILE* f, elf32_t *elf, int index) {
@@ -159,15 +169,15 @@ int get_section_ind_par_nom(const elf32_t *elf, const char *name) {
     return -1; //pas de section
 }
 
-
 void afficher_contenu_section(elf32_t *elf, char *param){
     int index_section = -1;
-
-    //Trouver l'index de la section 
-    if (is_numerical(param)) index_section = atoi(param);
-    else {
+    
+    // Trouver l'index de la section 
+    if (is_numerical(param)) {
+        index_section = atoi(param);
+    } else {
         for (int i = 0; i < elf->header.e_shnum; i++) {
-            //Calcul du nom : table des strings + offset du nom de la section
+            // Calcul du nom : table des strings + offset du nom de la section
             char *nom_courant = elf->section_str_table + elf->sections[i].h_section.sh_name;
             if (strcmp(nom_courant, param) == 0) {
                 index_section = i;
@@ -175,52 +185,58 @@ void afficher_contenu_section(elf32_t *elf, char *param){
             }
         }
     }
-
+    
     if (index_section < 0 || index_section >= elf->header.e_shnum) {
-        printf("Erreur : Section '%s' introuvable.\n", param);
+        printf("\nreadelf: Warning: Section '%s' was not dumped because it does not exist!\n", param);
         return;
     }
-
-    // Affichage
+    
     elf32_sections *sect = &elf->sections[index_section];
+    char *nom_section = elf->section_str_table + sect->h_section.sh_name;
     
-    // Si c'est une section vide (.bss)
-    if (sect->contenu == NULL) {
-        printf("Section %d sans contenu.\n", index_section);
+    // Si c'est une section vide ou sans contenu
+    if (sect->contenu == NULL || sect->h_section.sh_size == 0) {
+        printf("\nSection '%s' has no data to dump.\n", nom_section);
         return;
     }
-    printf("Contenu de la section '%s' (Index %d) :\n", param, index_section);
     
+    // Affichage de l'en-tête
+    printf("\nHex dump of section '%s':\n", nom_section);
+    
+    // Affichage du contenu
     for (Elf32_Word i = 0; i < sect->h_section.sh_size; i += 16) {
-
-        /* Adresse */
-        printf("  0x%08x ", i);
-
-        /* Partie HEX */
+        // Adresse (avec l'adresse de base de la section si elle est chargée en mémoire)
+        printf("  0x%08x ", sect->h_section.sh_addr + i);
+        
+        // Partie HEX (4 groupes de 4 octets)
         for (int j = 0; j < 16; j++) {
-            if (i + j < sect->h_section.sh_size)
+            if (i + j < sect->h_section.sh_size) {
                 printf("%02x", sect->contenu[i + j]);
-            else
+            } else {
                 printf("  ");
-
-            if ((j + 1) % 4 == 0) printf(" ");
+            }
+            
+            // Espacement tous les 4 octets
+            if ((j + 1) % 4 == 0) {
+                printf(" ");
+            }
         }
-
-        /* Partie ASCII */
-        printf(" ");
-
+        
+        // Partie ASCII
         for (int j = 0; j < 16 && i + j < sect->h_section.sh_size; j++) {
             unsigned char c = sect->contenu[i + j];
-            if (isprint(c))
+            if (isprint(c)) {
                 printf("%c", c);
-            else
+            } else {
                 printf(".");
+            }
         }
-
+        
         printf("\n");
     }
+    
+    printf("\n");
 }
-
 
 elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2) {
     elf32_fusion_sections* fusion = malloc(sizeof(elf32_fusion_sections));
