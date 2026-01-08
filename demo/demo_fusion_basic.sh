@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "=== DEMO : FUSION DES SECTIONS ==="
+echo "=== DEMO : FUSION ==="
 
 ELF1=../tests/linkerTests/test3/testMain.o
 ELF2=../tests/linkerTests/test3/test3.o
