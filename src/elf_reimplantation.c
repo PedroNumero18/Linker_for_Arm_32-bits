@@ -351,7 +351,9 @@ elf32_fusion_reimpl* fusion_reimpl(elf32_t* elf1, elf32_t* elf2, elf32_fusion_se
                 uint32_t sym_idx = get_rel_sym(rel[j].r_info);
                 R_ARM_Type r_type = (R_ARM_Type)ELF32_R_TYPE(rel[j].r_info);
                 
-                int new_sym_idx = fusion_sym->sym_map_elf1[sym_idx];
+                int new_sym_idx = 0;
+                if (sym_idx < (uint32_t)elf1->nb_symboles) new_sym_idx = fusion_sym->sym_map_elf1[sym_idx];
+                else fprintf(stderr, "Erreur: symbole index %u hors limites (max: %d)\n", sym_idx, elf1->nb_symboles); 
                 fusion->rel_table[idx_rel].r_info = ELF32_R_INFO(new_sym_idx, r_type);
                 
                 idx_rel++;
