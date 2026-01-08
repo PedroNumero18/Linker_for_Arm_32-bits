@@ -12,6 +12,7 @@ elf32_t* elf_init() {
     memset(&elf->header, 0, sizeof(Elf32_Ehdr));
     elf->sections = NULL;
     elf->section_str_table = NULL;
+    //elf->symbol_str_table = NULL;
     elf->table_symbole = NULL;
     elf->nb_symboles = 0;
     elf->rel_table = NULL;

@@ -16,7 +16,8 @@ void print_flags(const char* nom){
            " -x \t\t\t montre le contenue d'une section choisie\n"
            " -s \t\t\t montre la table des symboles du fichier\n"
            " -r \t\t\t montre les tables de réimplantation\n"
-    , nom);
+           " -f \t\t fusionne deux fichiers ELF (étape 6)\n"
+    , nom, nom);
     return;
 }
 
@@ -47,9 +48,10 @@ int main(int argc,char *argv[]){
     
     lire_header(inputFile, elf);
     lire_sections(inputFile, elf);
-    lire_contenu_sect(inputFile, elf, 6);
+    //lire_contenu_sect(inputFile, elf, 6);
     lire_symbole(inputFile, elf);
     lire_Reimple(inputFile, elf);
+    
 
     if(h_flag || a_flag) affichage_entete(&elf->header);
     if(S_flag || a_flag) afficher_sections(elf); 

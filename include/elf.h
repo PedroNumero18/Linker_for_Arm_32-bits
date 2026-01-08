@@ -57,11 +57,14 @@ extern char* filename;   //Nom de fichier défini dans le main
 #define SHT_REL            9
 #define SHT_SHLIB          10
 #define SHT_DYNSYM         11
+#define SHT_SHSTRTAB 0x3
 #define SHT_LOPROC         0x70000000
 #define SHT_HIPROC         0x7fffffff
 #define SHT_LOUSER         0x80000000
 #define SHT_HIUSER         0xffffffff
 #define SHT_ARM_ATTRIBUTES 0x70000003U
+
+#define SHN_UNDEF 0 //indéfini
 
 
 //sh_flags 
@@ -202,11 +205,20 @@ typedef struct {
 
 /*etape6 fusion des sections*/
 typedef struct {
-   elf32_sections* sections;   
-   int  nb_sections;
-   int* section_map_elf2;
-   int* section_offset_elf2;
- } elf32_fusion_sections;
+    int ancien_index;      // index dans ELF2
+    int nouvel_index;      // index dans le fichier fusion
+    uint32_t offset;    // offset de concaténation
+} section_map_t;
+
+typedef struct {
+    elf32_sections *sections;
+    int nb_sections;
+    section_map_t *map_elf2; 
+    int nb_map;
+	char *shstrtab_orig;
+	char* section_str_table;
+} elf32_fusion_sections;
+
 
 /* Table de symboles fusionnée (symtab de sortie) */
  typedef struct {
@@ -223,8 +235,8 @@ typedef struct {
 typedef struct { 
   Elf32_Ehdr      header ;
   elf32_sections* sections;
-  char*           section_str_table;	/* .shstrtab pour les noms des sections */
-  char*           symbol_str_table;   /* .strtab pour les noms des symboles */
+  char*           section_str_table;
+  char*           symbol_str_table;
   Elf32_Sym*      table_symbole; /* ajout de la table des symboles*/
   uint32_t        nb_symboles;
   Elf32_Rel* 	  rel_table;
@@ -249,11 +261,14 @@ void afficher_sections(const elf32_t* elf);
 //Cotenu section
 void lire_contenu_sect( FILE* f, elf32_t *elf, int index);
 int get_section_ind_par_nom(const elf32_t *elf, const char *name);
+const char *get_type(Elf32_Word t);
 void afficher_contenu_section( elf32_t *elf, char *param);
 
 //FUSION SECTION
 elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2);
+uint32_t calculer_e_shoff(const elf32_fusion_sections* fusion);
 void free_fusion_sections(elf32_fusion_sections* fusion);
+
 
 //Table des symboles
 void lire_symbole(FILE* file, elf32_t* elf);
