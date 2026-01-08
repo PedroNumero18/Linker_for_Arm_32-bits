@@ -82,7 +82,7 @@ extern char* filename;
 #define SHF_MASKPROC           0xf0000000      /* Processor-specific */
 #define SHF_ORDERED            (1 << 30)       /* Special ordering requirement(Solaris).  */
 #define SHF_EXCLUDE            (1 << 31)       /* Section is excluded unless
-                                                  referenced or allocated (Solaris).*/
+                                               /*referenced or allocated (Solaris).*/
 
 #define STN_UNDEF 0 /*index des symboles non définis et de la premiere entréé*/
 
