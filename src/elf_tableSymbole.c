@@ -162,8 +162,8 @@ elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2){
     /*Section elf1 symbole locall*/
     for (int i = 0; i < (int)elf1->nb_symboles; i++) {
         if (ELF32_ST_BIND( elf1->table_symbole[i].st_info) == STB_LOCAL){
-            fusion->table_symbole[i] = elf1->table_symbole[i];
-            fusion->sym_map_elf1[i] = i;
+            fusion->table_symbole[fusion->nb_sym] = elf1->table_symbole[i];
+            fusion->sym_map_elf1[i] = fusion->nb_sym;
 
             //On ajoute notre symbole dans la strtab resultat
             char *nom_symbole;
@@ -332,7 +332,26 @@ elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2){
             globaux[i].index_fusion = fusion->nb_sym;
             fusion->nb_sym++;
         }
+        
+        if (globaux[i].sym1) {
+            for (int k = 0; k < (int)elf1->nb_symboles; k++){
+                if (&elf1->table_symbole[k] == globaux[i].sym1) {
+                    fusion->sym_map_elf1[k] = fusion->nb_sym;
+                    k=elf1->nb_symboles;
+                }
+            }
+        }
+        if (globaux[i].sym2) {
+        for (int k = 0; k < (int)elf2->nb_symboles; k++) {
+            if (&elf2->table_symbole[k] == globaux[i].sym2) {
+                fusion->sym_map_elf2[k] = fusion->nb_sym;
+                k=elf2->nb_symboles;;
+                }
+            }
+        } 
+    
     }
+
     free(globaux);
     return fusion;
 }
