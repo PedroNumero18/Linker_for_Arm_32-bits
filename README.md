@@ -65,7 +65,7 @@ une liste des toutes les options possibles est disponible en tapant:
 - Fusion des table de reimplantaion de deux fichier ELF
 
 ### Fonctionnalités manquantes :
-- la Phase 2 non terminer
+- la Phase 2 incomplète
 - les parties 6, 7 et 8 non tester
 - la partie 9.
 - les fichiers en litte endian non pris en compte
