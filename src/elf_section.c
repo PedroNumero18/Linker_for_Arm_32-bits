@@ -130,29 +130,20 @@ void afficher_sections(const elf32_t* elf) {
 }
 
 void lire_contenu_sect( FILE* f, elf32_t *elf, int index) {
-    // Récupération du pointeur vers la section spécifique dans votre tableau
     elf32_sections *section = &elf->sections[index];
-
-    // On verifie si la section est vide ou virtuelle (comme .bss)
-    // SHT_NOBITS = 8. On n'a rien à lire pour ces sections.
     if (section->h_section.sh_type == SHT_NOBITS || section->h_section.sh_size == 0) {
         section->contenu = NULL;
         return;
     }
 
-    // Allocation de la mémoire pour le contenu
     section->contenu = malloc(sizeof(uint8_t) * section->h_section.sh_size);
     if (section->contenu == NULL) {
         error("Erreur d'allocation mémoire");
     }
-
-    // On se positionne au bon endroit dans le fichier
-    // On utilise 'h_section.sh_offset'
     if (fseek(f, section->h_section.sh_offset, SEEK_SET) != 0) {
         error("Erreur de fseek");
     }
 
-    // On fait la lecture des données brutes
     fread(section->contenu, 1, section->h_section.sh_size, f);
 }
 
@@ -172,12 +163,10 @@ int get_section_ind_par_nom(const elf32_t *elf, const char *name) {
 void afficher_contenu_section(elf32_t *elf, char *param){
     int index_section = -1;
     
-    // Trouver l'index de la section 
     if (is_numerical(param)) {
         index_section = atoi(param);
     } else {
         for (int i = 0; i < elf->header.e_shnum; i++) {
-            // Calcul du nom : table des strings + offset du nom de la section
             char *nom_courant = elf->section_str_table + elf->sections[i].h_section.sh_name;
             if (strcmp(nom_courant, param) == 0) {
                 index_section = i;
@@ -194,35 +183,27 @@ void afficher_contenu_section(elf32_t *elf, char *param){
     elf32_sections *sect = &elf->sections[index_section];
     char *nom_section = elf->section_str_table + sect->h_section.sh_name;
     
-    // Si c'est une section vide ou sans contenu
+    //Si c'est une section vide ou sans contenu
     if (sect->contenu == NULL || sect->h_section.sh_size == 0) {
         printf("\nSection '%s' has no data to dump.\n", nom_section);
         return;
     }
     
-    // Affichage de l'en-tête
     printf("\nHex dump of section '%s':\n", nom_section);
     
-    // Affichage du contenu
     for (Elf32_Word i = 0; i < sect->h_section.sh_size; i += 16) {
-        // Adresse (avec l'adresse de base de la section si elle est chargée en mémoire)
         printf("  0x%08x ", sect->h_section.sh_addr + i);
-        
-        // Partie HEX (4 groupes de 4 octets)
         for (int j = 0; j < 16; j++) {
             if (i + j < sect->h_section.sh_size) {
                 printf("%02x", sect->contenu[i + j]);
             } else {
                 printf("  ");
             }
-            
-            // Espacement tous les 4 octets
             if ((j + 1) % 4 == 0) {
                 printf(" ");
             }
         }
 
-        //ASCII
         printf(" ");
 
         for (int j = 0; j < 16 && i + j < sect->h_section.sh_size; j++) {
