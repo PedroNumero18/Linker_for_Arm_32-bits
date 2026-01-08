@@ -1,5 +1,6 @@
 ## Projet éditeur de lien ELF pour architecture ARM en Big endian
 
+
 ### Lundi 15 Décembre 2025:  
 ```{text}
 présentation du code source  
@@ -62,6 +63,6 @@ debut de la fusion des reimplantation
 ```{text}
 avancement de la fusion des reimplantation
 Rédaction du README.md 
-ajout de fonction d'affichage pour debug les fusions 
+ajout de fonction d'affichage pour debug les fusions.
 ```
 
