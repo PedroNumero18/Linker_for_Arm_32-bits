@@ -40,5 +40,6 @@ modif table Reimpl (a tester avec un fichier avec des readresage a faire)
 ### Lundi 05 Janvier 2025
 ``` {text}
 Préparation de la diapo
-
+début de la phase 2
+création de la structure elf32_fusion_sections
 ```

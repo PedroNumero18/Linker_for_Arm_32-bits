@@ -1,7 +1,6 @@
 #include <stdlib.h> 
 #include <stdio.h>
 
-#include "utils.h"
 #include "elf.h"
 
 const char* get_rel_type_name(R_ARM_Type r_type) {
@@ -180,7 +179,7 @@ void corriger_addend_section(elf32_sections* sect_fusion, uint32_t r_offset, R_A
     switch(r_type) {
         /* Adresses absolues 32 bits */
         case R_ARM_ABS32:
-        case R_ARM_TARGET1:     
+        case R_ARM_TARGET1:
         case R_ARM_TARGET2:      
             valeur += offset_section_def;
             ecrire_contenu_32bits(sect_fusion, r_offset, valeur);
@@ -307,3 +306,157 @@ void corriger_addend_section(elf32_sections* sect_fusion, uint32_t r_offset, R_A
     }
 }
 
+elf32_fusion_reimpl* fusion_reimpl(elf32_t* elf1, elf32_t* elf2, elf32_fusion_sections* fusion_sect, elf32_fusion_symboles* fusion_sym){
+    elf32_fusion_reimpl* fusion = fusion_reimpl_init();
+    
+    /* Compter le nombre total d'entrées REL */
+    int total_rel = 0;
+    
+    for (int i = 0; i < elf1->header.e_shnum; i++) {
+        Elf32_Shdr* sh = &elf1->sections[i].h_section;
+        if (sh->sh_type == SHT_REL) {
+            total_rel += sh->sh_size / sizeof(Elf32_Rel);
+        }
+    }
+    
+    for (int i = 0; i < elf2->header.e_shnum; i++) {
+        Elf32_Shdr* sh = &elf2->sections[i].h_section;
+        if (sh->sh_type == SHT_REL) {
+            total_rel += sh->sh_size / sizeof(Elf32_Rel);
+        }
+    }
+    
+    if (total_rel == 0) {
+        return fusion;
+    }
+    
+    fusion->rel_table = malloc(total_rel * sizeof(Elf32_Rel));
+    if (!fusion->rel_table) error("Erreur allocation table REL fusionnée");
+    
+    int idx_rel = 0;
+    
+    /*Fusionner les tables REL du premier fichier  */
+    for (int i = 0; i < elf1->header.e_shnum; i++) {
+        Elf32_Shdr* sh = &elf1->sections[i].h_section;
+        
+        if (sh->sh_type == SHT_REL) {
+            int nb_entries = sh->sh_size / sizeof(Elf32_Rel);
+            Elf32_Rel* rel = (Elf32_Rel*)elf1->sections[i].contenu;
+            
+            for (int j = 0; j < nb_entries; j++) {
+                fusion->rel_table[idx_rel] = rel[j];
+                
+                /* Corriger le numéro de symbole avec la map de elf1 */
+                uint32_t sym_idx = get_rel_sym(rel[j].r_info);
+                R_ARM_Type r_type = (R_ARM_Type)ELF32_R_TYPE(rel[j].r_info);
+                
+                int new_sym_idx = fusion_sym->sym_map_elf1[sym_idx];
+                fusion->rel_table[idx_rel].r_info = ELF32_R_INFO(new_sym_idx, r_type);
+                
+                idx_rel++;
+            }
+        }
+    }
+    
+    /* Fusionner les tables REL du deuxième fichier  */
+    for (int i = 0; i < elf2->header.e_shnum; i++) {
+        Elf32_Shdr* sh = &elf2->sections[i].h_section;
+        
+        if (sh->sh_type == SHT_REL) {
+            int nb_entries = sh->sh_size / sizeof(Elf32_Rel);
+            Elf32_Rel* rel = (Elf32_Rel*)elf2->sections[i].contenu;
+            
+            int section_concernee = sh->sh_info;
+            
+            /* Trouver l'offset de concaténation et le nouvel index de cette section */
+            uint32_t offset_concat = 0;
+            int nouvel_idx_section = -1;
+            
+            for (int k = 0; k < fusion_sect->nb_map; k++) {
+                if (fusion_sect->map_elf2[k].ancien_index == section_concernee) {
+                    offset_concat = fusion_sect->map_elf2[k].offset;
+                    nouvel_idx_section = fusion_sect->map_elf2[k].nouvel_index;
+                    break;
+                }
+            }
+            
+            for (int j = 0; j < nb_entries; j++) {
+                fusion->rel_table[idx_rel] = rel[j];
+                
+                /* 1. Corriger l'offset de réimplantation */
+                fusion->rel_table[idx_rel].r_offset += offset_concat;
+                
+                /* 2. Corriger le numéro de symbole */
+                uint32_t sym_idx = get_rel_sym(rel[j].r_info);
+                R_ARM_Type r_type = (R_ARM_Type)ELF32_R_TYPE(rel[j].r_info);
+                
+                int new_sym_idx = fusion_sym->sym_map_elf2[sym_idx];
+                fusion->rel_table[idx_rel].r_info = ELF32_R_INFO(new_sym_idx, r_type);
+                
+                /* 3. Si c'est un symbole SECTION, corriger l'addend dans le contenu */
+                Elf32_Sym* symbole = &fusion_sym->table_symbole[new_sym_idx];
+                
+                if (ELF32_ST_TYPE(symbole->st_info) == STT_SECTION) {
+                    /* Trouver l'offset de concaténation de la section de définition */
+                    uint32_t offset_section_def = 0;
+                    uint16_t shndx = symbole->st_shndx;
+                    
+                    /* Si la section de définition vient de elf2 */
+                    for (int k = 0; k < fusion_sect->nb_map; k++) {
+                        if (fusion_sect->map_elf2[k].nouvel_index == shndx) {
+                            offset_section_def = fusion_sect->map_elf2[k].offset;
+                            break;
+                        }
+                    }
+                    
+                    /* Corriger l'addend dans le contenu de la section fusionnée */
+                    if (nouvel_idx_section >= 0 && nouvel_idx_section < fusion_sect->nb_sections) {
+                        corriger_addend_section(&fusion_sect->sections[nouvel_idx_section],
+                                              fusion->rel_table[idx_rel].r_offset,
+                                              r_type,
+                                              offset_section_def);
+                    }
+                }
+                
+                idx_rel++;
+            }
+        }
+    }
+    fusion->nb_rel = idx_rel;
+    return fusion;
+}
+
+void afficher_fusion_reimpl(elf32_fusion_reimpl* fusion, elf32_fusion_symboles* sym) {
+    printf("\n=== Table de réimplantation fusionnée ===\n");
+    printf("Nombre d'entrées REL : %d\n\n", fusion->nb_rel);
+    
+    if (fusion->nb_rel == 0) {
+        printf("Aucune réimplantation.\n");
+        return;
+    }
+    
+    printf("%-6s %-12s %-20s %-6s %s\n", 
+           "Index", "Offset", "Type", "Sym", "Nom du symbole");
+    printf("--------------------------------------------------------------\n");
+    
+    for (int i = 0; i < fusion->nb_rel; i++) {
+        uint32_t sym_idx = get_rel_sym(fusion->rel_table[i].r_info);
+        R_ARM_Type r_type = (R_ARM_Type)ELF32_R_TYPE(fusion->rel_table[i].r_info);
+        const char* type_str = get_rel_type_name(r_type);
+        
+        const char* sym_name = "???";
+        if (sym_idx < sym->nb_sym) {
+            Elf32_Sym* s = &sym->table_symbole[sym_idx];
+            if (s->st_name < sym->strtab_size) {
+                sym_name = sym->strtab + s->st_name;
+            }
+        }
+        
+        printf("[%3d]  0x%08x  %-20s  %4d  %s\n",
+               i,
+               fusion->rel_table[i].r_offset,
+               type_str,
+               sym_idx,
+               sym_name);
+    }
+}

@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "utils.h"
 #include "elf.h"
 
 void lire_symbole(FILE* file, elf32_t* elf){

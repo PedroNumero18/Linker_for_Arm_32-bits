@@ -3,7 +3,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "utils.h"
 #include "elf.h"
 
 
@@ -241,7 +240,6 @@ void afficher_contenu_section(elf32_t *elf, char *param){
     printf("\n");
 }
 
-
 uint32_t calculer_e_shoff(const elf32_fusion_sections* fusion) {
     uint32_t offset = sizeof(Elf32_Ehdr);
 
@@ -256,13 +254,10 @@ uint32_t calculer_e_shoff(const elf32_fusion_sections* fusion) {
     return offset;
 }
 
-
-
-static int est_fusionnable(const Elf32_Shdr *s) {
+int est_fusionnable(const Elf32_Shdr *s) {
     return (s->sh_type == SHT_PROGBITS) &&
            (s->sh_flags & SHF_ALLOC);
 }
-
 
 elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2) {
     if (!elf1 || !elf2) error("ELF non initialisé");

@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <stdio.h> 
 
-extern char* filename;   //Nom de fichier défini dans le main
-
+#include "utils.h"
+extern char* filename;
 
 //Constantes ELF
 #define EI_MAG0        0
@@ -271,15 +271,6 @@ typedef struct {
     int nb_rel_sections;        /* Nombre de sections REL */
 } elf32_fusion_reimpl;
 
-/* Structure pour stocker les tables de réimplantation fusionnées */
-typedef struct {
-    Elf32_Rel* rel_table;       /* Table REL fusionnée */
-    int nb_rel;
-    int* rel_section_info;      /* sh_info de chaque section REL */
-    int nb_rel_sections;        /* Nombre de sections REL */
-} elf32_fusion_reimpl;
-
-
 /*Structure represantant le contenu du fichier ELF*/
 typedef struct { 
   Elf32_Ehdr      header ;
@@ -333,5 +324,11 @@ elf32_fusion_symboles* fusion_symboles(elf32_t* elf1, elf32_t* elf2);
 //REIMPLEMENTATION
 void lire_Reimple(FILE* file, elf32_t* elf);
 void afficher_Reimple(elf32_t* elf);
+
+//FUSION REIMPLEMENTATION
+elf32_fusion_reimpl* fusion_reimpl_init();
+elf32_fusion_reimpl* fusion_reimpl(elf32_t* elf1, elf32_t* elf2, elf32_fusion_sections* fusion_sect, elf32_fusion_symboles* fusion_sym);
+void free_fusion_reimpl(elf32_fusion_reimpl* fusion);
+void afficher_fusion_reimpl(elf32_fusion_reimpl* fusion, elf32_fusion_symboles* sym);
 
 #endif

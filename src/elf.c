@@ -3,7 +3,8 @@
 #include <string.h>
 
 #include "elf.h"
-#include "utils.h"
+
+/* ====== Gestion des Structures ====== */
 
 elf32_t* elf_init() {
     elf32_t* elf = malloc(sizeof(elf32_t));
@@ -36,4 +37,26 @@ void elf_free(elf32_t* elf){
     if (elf->RELA_table)    free(elf->RELA_table);
     
     free(elf); 
+}
+
+elf32_fusion_sections* fusion_sect_init(){
+
+}
+elf32_fusion_reimpl* fusion_reimpl_init(){
+    elf32_fusion_reimpl* fusion = malloc(sizeof(elf32_fusion_reimpl));
+    if (!fusion) error("Erreur allocation mémoire pour fusion réimplantation");
+
+    fusion->nb_rel = 0;
+    fusion->nb_rel_sections = 0;
+    fusion->rel_table = NULL;
+    fusion->rel_section_info = NULL;
+    return fusion;
+}
+
+void free_fusion_reimpl(elf32_fusion_reimpl* fusion) {
+    if (fusion) {
+        free(fusion->rel_table);
+        free(fusion->rel_section_info);
+        free(fusion);
+    }
 }

@@ -16,8 +16,7 @@ void print_flags(const char* nom){
            " -x \t\t\t montre le contenue d'une section choisie\n"
            " -s \t\t\t montre la table des symboles du fichier\n"
            " -r \t\t\t montre les tables de réimplantation\n"
-           " -f \t\t fusionne deux fichiers ELF (étape 6)\n"
-    , nom, nom);
+    , nom);
     return;
 }
 
