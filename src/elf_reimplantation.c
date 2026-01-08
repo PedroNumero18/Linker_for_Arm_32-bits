@@ -167,7 +167,7 @@ void afficher_Reimple(elf32_t* elf){
                 r.r_offset,              
                 r.r_info,                
                 get_rel_type(r.r_info),  
-                elf->table_symbole[sym_idx].st_value ? : ,
+                elf->table_symbole[sym_idx].st_value,
                 sym_name
             );
         }
