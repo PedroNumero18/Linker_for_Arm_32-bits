@@ -1,5 +1,6 @@
 #include <stdlib.h> 
 #include <stdio.h>
+#include <string.h>
 
 #include "elf.h"
 
@@ -390,7 +391,11 @@ elf32_fusion_reimpl* fusion_reimpl(elf32_t* elf1, elf32_t* elf2, elf32_fusion_se
                 uint32_t sym_idx = get_rel_sym(rel[j].r_info);
                 R_ARM_Type r_type = (R_ARM_Type)ELF32_R_TYPE(rel[j].r_info);
                 
-                int new_sym_idx = fusion_sym->sym_map_elf2[sym_idx];
+                int new_sym_idx = 0;
+
+                if (sym_idx < (uint32_t)elf2->nb_symboles) new_sym_idx = fusion_sym->sym_map_elf2[sym_idx];
+                else fprintf(stderr, "Erreur: symbole index %u hors limites (max: %d)\n", sym_idx, elf2->nb_symboles);  // ou error(...)
+                
                 fusion->rel_table[idx_rel].r_info = ELF32_R_INFO(new_sym_idx, r_type);
                 
                 /* 3. Si c'est un symbole SECTION, corriger l'addend dans le contenu */
@@ -445,9 +450,9 @@ void afficher_fusion_reimpl(elf32_fusion_reimpl* fusion, elf32_fusion_symboles* 
         const char* type_str = get_rel_type_name(r_type);
         
         const char* sym_name = "???";
-        if (sym_idx < sym->nb_sym) {
+        if (sym_idx < (uint32_t) sym->nb_sym) {
             Elf32_Sym* s = &sym->table_symbole[sym_idx];
-            if (s->st_name < sym->strtab_size) {
+            if (s->st_name < (unsigned int)sym->strtab_size) {
                 sym_name = sym->strtab + s->st_name;
             }
         }

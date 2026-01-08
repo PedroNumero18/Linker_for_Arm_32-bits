@@ -262,8 +262,8 @@ int est_fusionnable(const Elf32_Shdr *s) {
 elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2) {
     if (!elf1 || !elf2) error("ELF non initialisé");
 
-    elf32_fusion_sections* fusion = malloc(sizeof(elf32_fusion_sections));
-    if (!fusion) error("Erreur malloc fusion");
+    elf32_fusion_sections* fusion = fusion_sect_init();
+    if (!fusion) error("Erreur malloc fusion section");
 
     int max_sections = elf1->header.e_shnum + elf2->header.e_shnum;
     fusion->sections = malloc(sizeof(elf32_sections) * max_sections);

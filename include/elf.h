@@ -298,13 +298,14 @@ void affichage_entete(Elf32_Ehdr* header);
 void lire_sections(FILE* file,elf32_t* elf);
 void afficher_sections(const elf32_t* elf);
 
-//Cotenu section
+//Contenu section
 void lire_contenu_sect( FILE* f, elf32_t *elf, int index);
 int get_section_ind_par_nom(const elf32_t *elf, const char *name);
 const char *get_type(Elf32_Word t);
 void afficher_contenu_section( elf32_t *elf, char *param);
 
 //FUSION SECTION
+elf32_fusion_sections* fusion_sect_init();
 elf32_fusion_sections* fusion_sections(elf32_t* elf1, elf32_t* elf2);
 uint32_t calculer_e_shoff(const elf32_fusion_sections* fusion);
 void free_fusion_sections(elf32_fusion_sections* fusion);

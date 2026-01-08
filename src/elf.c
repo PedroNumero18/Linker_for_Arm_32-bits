@@ -40,8 +40,18 @@ void elf_free(elf32_t* elf){
 }
 
 elf32_fusion_sections* fusion_sect_init(){
-
+    elf32_fusion_sections* fusion = malloc(sizeof(elf32_fusion_sections));
+    
+    fusion->sections = NULL;
+    fusion->nb_sections = 0;
+    fusion->map_elf2 = NULL;
+    fusion->nb_map = 0;
+    fusion->shstrtab_orig = NULL;
+    fusion->section_str_table = NULL;
+    
+    return fusion;
 }
+
 elf32_fusion_reimpl* fusion_reimpl_init(){
     elf32_fusion_reimpl* fusion = malloc(sizeof(elf32_fusion_reimpl));
     if (!fusion) error("Erreur allocation mémoire pour fusion réimplantation");
