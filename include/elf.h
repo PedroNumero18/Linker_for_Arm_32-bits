@@ -230,6 +230,55 @@ typedef struct {
     int       *sym_map_elf2;
 } elf32_fusion_symboles;
 
+typedef enum {
+    R_ARM_NONE              = 0,
+    R_ARM_ABS32             = 2,
+    R_ARM_REL32             = 3,
+    R_ARM_LDR_PC_G0         = 4,
+    R_ARM_ABS16             = 5,
+    R_ARM_ABS12             = 6,
+    R_ARM_THM_ABS5          = 7,
+    R_ARM_ABS8              = 8,
+    R_ARM_SBREL32           = 9,
+    R_ARM_THM_CALL          = 10,
+    R_ARM_THM_PC8           = 11,
+    R_ARM_GOTOFF32          = 24,
+    R_ARM_BASE_PREL         = 25,
+    R_ARM_GOT_BREL          = 26,
+    R_ARM_CALL              = 28,
+    R_ARM_JUMP24            = 29,
+    R_ARM_THM_JUMP24        = 30,
+    R_ARM_BASE_ABS          = 31,
+    R_ARM_TARGET1           = 38,
+    R_ARM_V4BX              = 40,
+    R_ARM_TARGET2           = 41,
+    R_ARM_PREL31            = 42,
+    R_ARM_MOVW_ABS_NC       = 43,
+    R_ARM_MOVT_ABS          = 44,
+    R_ARM_MOVW_PREL_NC      = 45,
+    R_ARM_MOVT_PREL         = 46,
+    R_ARM_THM_MOVW_ABS_NC   = 47,
+    R_ARM_THM_MOVT_ABS      = 48,
+    R_ARM_THM_MOVW_PREL_NC  = 49,
+    R_ARM_THM_MOVT_PREL     = 50
+} R_ARM_Type;
+
+/* Structure pour stocker les tables de réimplantation fusionnées */
+typedef struct {
+    Elf32_Rel* rel_table;       /* Table REL fusionnée */
+    int nb_rel;
+    int* rel_section_info;      /* sh_info de chaque section REL */
+    int nb_rel_sections;        /* Nombre de sections REL */
+} elf32_fusion_reimpl;
+
+/* Structure pour stocker les tables de réimplantation fusionnées */
+typedef struct {
+    Elf32_Rel* rel_table;       /* Table REL fusionnée */
+    int nb_rel;
+    int* rel_section_info;      /* sh_info de chaque section REL */
+    int nb_rel_sections;        /* Nombre de sections REL */
+} elf32_fusion_reimpl;
+
 
 /*Structure represantant le contenu du fichier ELF*/
 typedef struct { 

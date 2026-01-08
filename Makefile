@@ -3,7 +3,7 @@ BIN_DIR=bin
 INCLUDE_DIR=include
 
 CC=clang
-CFLAGS=-Wall -Werror -Wextra -I$(INCLUDE_DIR) 
+CFLAGS=-Wall -Werror -Wextra -Wswitch -I$(INCLUDE_DIR) 
 
 TARGET=elfReader linker
 TEST=test_elfReader.py

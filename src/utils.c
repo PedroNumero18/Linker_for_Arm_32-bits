@@ -37,6 +37,29 @@ void inline get_8B(uint8_t* bits, FILE* file){
     }
 }
 
-void inline write_32B(uint32_t* bits, FILE* file);
-void inline write_16B(uint16_t* bits, FILE* file);
-void inline write_8B(uint8_t* bits, FILE* file);
+void inline write_32B(uint32_t* bits, FILE* file) {
+    uint32_t value = *bits;
+    if(!is_big_endian()) value = reverse_4(value);
+    
+    if (fwrite(&value, sizeof(uint32_t), 1, file) != 1) {
+        fprintf(stderr, "Erreur, écriture impossible sur 32bits pour '%s'\n", filename);
+        exit(1);
+    }
+}
+
+void inline write_16B(uint16_t* bits, FILE* file) {
+    uint16_t value = *bits;
+    if(!is_big_endian()) value = reverse_2(value);
+    
+    if (fwrite(&value, sizeof(uint16_t), 1, file) != 1) {
+        fprintf(stderr, "Erreur, écriture impossible sur 16bits pour '%s'\n", filename);
+        exit(1);
+    }
+}
+
+void inline write_8B(uint8_t* bits, FILE* file) {
+    if (fwrite(bits, sizeof(uint8_t), 1, file) != 1) {
+        fprintf(stderr, "Erreur, écriture impossible sur 8bits pour '%s'\n", filename);
+        exit(1);
+    }
+}
