@@ -17,4 +17,4 @@ echo " SECTION : $SECTION"
 echo "======================================"
 echo
 
-../elfReader -x "$ELF_FILE" "$SECTION"
+../elfReader -x "$SECTION" "$ELF_FILE"
